@@ -3,13 +3,12 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
-
     defaultConfig {
         applicationId "ubibots.getthemsgv2"
         minSdkVersion 18
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 19
+        versionCode 2
+        versionName "2.1.0"
     }
     buildTypes {
         release {
@@ -17,19 +16,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
-    compile files('libs/jackson-annotations-2.3.0.jar')
-    compile files('libs/jackson-core-2.3.1.jar')
-    compile files('libs/jackson-databind-2.3.1.jar')
-    compile files('libs/joda-time-2.3.jar')
-    compile files('libs/logback-classic-1.0.13.jar')
-    compile files('libs/logback-core-1.0.13.jar')
-    compile files('libs/netty-all-4.0.19.Final.jar')
-    compile files('libs/slf4j-api-1.7.6.jar')
-    compile files('libs/thingworx-common.jar')
+    compile 'com.github.lecho:hellocharts-library:1.5.8@aar'
 }
