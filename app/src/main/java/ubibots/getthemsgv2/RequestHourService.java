@@ -16,14 +16,12 @@ public class RequestHourService extends AsyncTask<String, Integer, String> {
     private ArrayList<String> hourTime;
     private int id;
     private String strURL;
-    private int[] count;
 
-    RequestHourService(ArrayList<Double> temperatureHour, ArrayList<Double> humidityHour, ArrayList<String> hourTime, int id, int[] count) {
+    RequestHourService(ArrayList<Double> temperatureHour, ArrayList<Double> humidityHour, ArrayList<String> hourTime, int id) {
         this.temperatureHour = temperatureHour;
         this.humidityHour = humidityHour;
         this.hourTime = hourTime;
         this.id = id;
-        this.count = count;
     }
 
     //该方法并不运行在UI线程当中，主要用于异步操作，所有在该方法中不能对UI当中的空间进行设置和修改
@@ -70,8 +68,8 @@ public class RequestHourService extends AsyncTask<String, Integer, String> {
                 double temp = toDouble(tmp.get(1));
                 double humi = toDouble(tmp.get(2));
 
-                if (t.length()!=24 || temp <= 0 || humi <= 0) {
-                    RequestHourService another = new RequestHourService(temperatureHour, humidityHour, hourTime, id, count);
+                if (t.length() != 24 || temp <= 0 || humi <= 0) {
+                    RequestHourService another = new RequestHourService(temperatureHour, humidityHour, hourTime, id);
                     System.out.println(strURL);
                     another.execute(strURL);
                     return;
@@ -79,13 +77,11 @@ public class RequestHourService extends AsyncTask<String, Integer, String> {
                 hourTime.set(id, tmp.get(0));
                 temperatureHour.set(id, temp);
                 humidityHour.set(id, humi);
-                count[0]++;
-                System.out.println("Time: " + hourTime.get(id) + " " + "Temperature: " + temperatureHour.get(id) + " " + "Humidity: " + humidityHour.get(id) + " " + "Count: " + count[0]);
-            }else{
-                RequestHourService another = new RequestHourService(temperatureHour, humidityHour, hourTime, id, count);
+                System.out.println("Time: " + hourTime.get(id) + " " + "Temperature: " + temperatureHour.get(id) + " " + "Humidity: " + humidityHour.get(id) + " " + "Num: " + id);
+            } else {
+                RequestHourService another = new RequestHourService(temperatureHour, humidityHour, hourTime, id);
                 System.out.println(strURL);
                 another.execute(strURL);
-                return;
             }
         }
     }

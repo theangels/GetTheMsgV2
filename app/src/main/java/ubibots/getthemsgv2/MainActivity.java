@@ -208,7 +208,7 @@ public class MainActivity extends Activity {
         params.put("oldestFirst", "false");
 
         strUrl = addParameter(strUrl, params);
-        RequestHourService requestTemperature = new RequestHourService(temperatureHour, humidityHour, hourTime, id, count);
+        RequestHourService requestTemperature = new RequestHourService(temperatureHour, humidityHour, hourTime, id);
         requestTemperature.execute(strUrl);
     }
 
