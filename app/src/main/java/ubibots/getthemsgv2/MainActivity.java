@@ -40,7 +40,7 @@ import lecho.lib.hellocharts.view.ColumnChartView;
 
 public class MainActivity extends Activity {
 
-    private int delayTime = 60000;
+    private int delayTime = 10000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,14 +161,32 @@ public class MainActivity extends Activity {
      * Request
      */
     private RequestHandler requestHandler;
+
     private int[] count;
+    private boolean[] display;
+    private boolean[] request;
+
+    public int[] getCount() {
+        return count;
+    }
+
+    public boolean[] getDisplay() {
+        return display;
+    }
+
+    public boolean[] getRequest() {
+        return request;
+    }
 
     private void initRequest() {
         temperatureHour = new ArrayList<>();
         humidityHour = new ArrayList<>();
         hourTime = new ArrayList<>();
         count = new int[]{0,0,0,0,0};//Hour Day Week Month Year
-        for (int i = 0; i < 120; i++) {
+        display = new boolean[]{false,false,false,false,false};
+        request = new boolean[]{true,true,true,true,true};
+
+        for (int i = 0; i < RequestHourService.MAX; i++) {
             temperatureHour.add(0.0);
             humidityHour.add(0.0);
             hourTime.add("");
@@ -208,7 +226,7 @@ public class MainActivity extends Activity {
         params.put("oldestFirst", "false");
 
         strUrl = addParameter(strUrl, params);
-        RequestHourService requestTemperature = new RequestHourService(temperatureHour, humidityHour, hourTime, id);
+        RequestHourService requestTemperature = new RequestHourService(this, temperatureHour, humidityHour, hourTime, id);
         requestTemperature.execute(strUrl);
     }
 
@@ -234,10 +252,13 @@ public class MainActivity extends Activity {
             MainActivity theActivity = mActivity.get();
             switch (msg.what) {
                 case 1:
-                    Calendar calendar = Calendar.getInstance();
-                    for (int i = 0; i < 120; i++) {
-                        theActivity.CalRequest(calendar, i);
-                        calendar.set(Calendar.SECOND, calendar.get(Calendar.SECOND) - 30);
+                    if(theActivity.getRequest()[0]) {
+                        theActivity.getRequest()[0] = false;
+                        Calendar calendar = Calendar.getInstance();
+                        for (int i = 0; i < RequestHourService.MAX; i++) {
+                            theActivity.CalRequest(calendar, i);
+                            calendar.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE) - 1);
+                        }
                     }
                     break;
             }
@@ -251,7 +272,7 @@ public class MainActivity extends Activity {
 
     private void initReceive() {
         receiveHandler = new ReceiveHandler(this);
-        receiveTimer.schedule(receiveTask, delayTime, delayTime);
+        receiveTimer.schedule(receiveTask, 0, delayTime);
     }
 
     Timer receiveTimer = new Timer();
@@ -281,13 +302,13 @@ public class MainActivity extends Activity {
             final float gold = (float) ((Math.sqrt(5) - 1) / 2);
             switch (msg.what) {
                 case 1:
-                    if (theActivity.temperatureHour.size() != 0) {//TemperatureHour
+                    if (theActivity.getDisplay()[0]) {//Hour
                         List<Column> temperatureHourColumnList = new ArrayList<>();
                         List<SubcolumnValue> temperatureHourValuesList = new ArrayList<>();
                         Column temperatureHourColumn = new Column(temperatureHourValuesList);
                         List<AxisValue> temperatureHourAxisValue = new ArrayList<>();
                         float m = 0;
-                        for (int i = theActivity.temperatureHour.size() - 1, num = 0; i >= 0; i--, num++) {
+                        for (int i = 0; i < theActivity.temperatureHour.size(); i++) {
                             float tmp = theActivity.temperatureHour.get(i).floatValue();
                             m = Math.max(m, tmp);
                             if ((tmp < DOWNTEMP)) {//重写低线
@@ -299,9 +320,9 @@ public class MainActivity extends Activity {
                             }
                             temperatureHourColumnList.add(temperatureHourColumn);
                             try {
-                                temperatureHourAxisValue.add(new AxisValue(num).setLabel(theActivity.hourTime.get(num).substring(11, 19)));
+                                temperatureHourAxisValue.add(new AxisValue(i).setLabel(theActivity.hourTime.get(i).substring(11, 19)));
                             }catch (Exception ex){
-                                System.out.println(theActivity.hourTime.get(num));
+                                System.out.println(theActivity.hourTime.get(i));
                             }
                                 temperatureHourValuesList = new ArrayList<>();
                             temperatureHourColumn = new Column(temperatureHourValuesList);
@@ -338,15 +359,13 @@ public class MainActivity extends Activity {
                         axisY2.setMaxLabelChars(4);
                         temperatureHourData.setAxisYRight(axisY2);
                         temperatureHourView.setColumnChartData(temperatureHourData);
-                    }
 
-                    if (theActivity.humidityHour.size() != 0) {//HumidityHour
                         List<Column> humidityHourColumnList = new ArrayList<>();
                         List<SubcolumnValue> humidityHourValuesList = new ArrayList<>();
                         Column humidityHourColumn = new Column(humidityHourValuesList);
                         List<AxisValue> humidityHourAxisValue = new ArrayList<>();
-                        float m = 0;
-                        for (int i = theActivity.humidityHour.size() - 1, num = 0; i >= 0; i--, num++) {
+                        m = 0;
+                        for (int i = 0; i < theActivity.humidityHour.size(); i++) {
                             float tmp = (theActivity.humidityHour.get(i).floatValue());
                             m = Math.max(m, tmp);
                             if ((tmp < DOWNHUMI)) {//重写高线
@@ -358,22 +377,22 @@ public class MainActivity extends Activity {
                             }
                             humidityHourColumnList.add(humidityHourColumn);
                             try{
-                                humidityHourAxisValue.add(new AxisValue(num).setLabel(theActivity.hourTime.get(num).substring(11,19)));
+                                humidityHourAxisValue.add(new AxisValue(i).setLabel(theActivity.hourTime.get(i).substring(11,19)));
                             }catch (Exception ex){
-                                System.out.println(theActivity.hourTime.get(num));
+                                System.out.println(theActivity.hourTime.get(i));
                             }
                             humidityHourValuesList = new ArrayList<>();
                             humidityHourColumn = new Column(humidityHourValuesList);
                         }
                         m = m / gold;
-                        SubcolumnValue ruler = new SubcolumnValue(m, Color.BLACK);
+                        ruler = new SubcolumnValue(m, Color.BLACK);
                         humidityHourValuesList.add(ruler);
                         humidityHourColumnList.add(humidityHourColumn);
                         humidityHourAxisValue.add(new AxisValue(theActivity.humidityHour.size()).setLabel("Before"));
                         ColumnChartData humidityHourData = new ColumnChartData(humidityHourColumnList);
 
                         //坐标轴
-                        Axis axisX = new Axis();//X轴
+                        axisX = new Axis();//X轴
                         axisX.setHasLines(true);
                         axisX.setHasTiltedLabels(true);
                         axisX.setTextColor(Color.WHITE);
@@ -382,21 +401,26 @@ public class MainActivity extends Activity {
                         axisX.setValues(humidityHourAxisValue);
                         humidityHourData.setAxisXBottom(axisX);
 
-                        Axis axisY1 = new Axis();//Y1轴
+                        axisY1 = new Axis();//Y1轴
                         axisY1.setHasLines(true);
                         axisY1.setTextColor(Color.WHITE);
                         axisY1.setName("湿度/%RH");
                         axisY1.setMaxLabelChars(4);
                         humidityHourData.setAxisYLeft(axisY1);
 
-                        Axis axisY2 = new Axis();//Y2轴
+                        axisY2 = new Axis();//Y2轴
                         axisY2.setHasLines(true);
                         axisY2.setTextColor(Color.WHITE);
                         axisY2.setName("湿度/%RH");
                         axisY2.setMaxLabelChars(4);
                         humidityHourData.setAxisYRight(axisY2);
                         humidityHourView.setColumnChartData(humidityHourData);
+
+                        theActivity.getCount()[0] = 0;
+                        theActivity.getDisplay()[0] = false;
+                        theActivity.getRequest()[0] = true;
                     }
+
             }
         }
     }

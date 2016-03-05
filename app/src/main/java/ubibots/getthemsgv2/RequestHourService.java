@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -16,8 +17,12 @@ public class RequestHourService extends AsyncTask<String, Integer, String> {
     private ArrayList<String> hourTime;
     private int id;
     private String strURL;
+    private MainActivity theActivity;
+    public final static int MAX = 120;
 
-    RequestHourService(ArrayList<Double> temperatureHour, ArrayList<Double> humidityHour, ArrayList<String> hourTime, int id) {
+    RequestHourService(MainActivity activity, ArrayList<Double> temperatureHour, ArrayList<Double> humidityHour, ArrayList<String> hourTime, int id) {
+        WeakReference<MainActivity> mActivity = new WeakReference<>(activity);
+        theActivity = mActivity.get();
         this.temperatureHour = temperatureHour;
         this.humidityHour = humidityHour;
         this.hourTime = hourTime;
@@ -69,17 +74,27 @@ public class RequestHourService extends AsyncTask<String, Integer, String> {
                 double humi = toDouble(tmp.get(2));
 
                 if (t.length() != 24 || temp <= 0 || humi <= 0) {
-                    RequestHourService another = new RequestHourService(temperatureHour, humidityHour, hourTime, id);
-                    System.out.println(strURL);
+                    RequestHourService another = new RequestHourService(theActivity, temperatureHour, humidityHour, hourTime, id);
                     another.execute(strURL);
                     return;
                 }
-                hourTime.set(id, tmp.get(0));
+                int GT = (int)toDouble(t.substring(11, 13)) + 8;
+                if (GT >= 24) {
+                    GT -= 24;
+                }
+                String all = tmp.get(0);
+                t = all.substring(0, 11) + GT + all.substring(13, all.length());
+                System.out.println(t);
+                hourTime.set(id, t);
                 temperatureHour.set(id, temp);
                 humidityHour.set(id, humi);
+                theActivity.getCount()[0]++;
+                if (theActivity.getCount()[0] == MAX) {
+                    theActivity.getDisplay()[0] = true;
+                }
                 System.out.println("Time: " + hourTime.get(id) + " " + "Temperature: " + temperatureHour.get(id) + " " + "Humidity: " + humidityHour.get(id) + " " + "Num: " + id);
             } else {
-                RequestHourService another = new RequestHourService(temperatureHour, humidityHour, hourTime, id);
+                RequestHourService another = new RequestHourService(theActivity, temperatureHour, humidityHour, hourTime, id);
                 System.out.println(strURL);
                 another.execute(strURL);
             }
