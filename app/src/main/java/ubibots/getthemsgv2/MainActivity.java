@@ -3,7 +3,6 @@ package ubibots.getthemsgv2;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -31,16 +30,15 @@ import java.util.TimerTask;
 
 import lecho.lib.hellocharts.gesture.ContainerScrollType;
 import lecho.lib.hellocharts.gesture.ZoomType;
-import lecho.lib.hellocharts.model.Axis;
-import lecho.lib.hellocharts.model.AxisValue;
-import lecho.lib.hellocharts.model.Column;
-import lecho.lib.hellocharts.model.ColumnChartData;
-import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.view.ColumnChartView;
 
 public class MainActivity extends Activity {
 
-    private int delayTime = 10000;
+    private int delayTime = 30000;
+
+    public int getDelayTime() {
+        return delayTime;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +48,6 @@ public class MainActivity extends Activity {
 
         hourViewInit();
         initRequest();
-        initReceive();
     }
 
     /**
@@ -64,6 +61,14 @@ public class MainActivity extends Activity {
     private List<View> hourViewList;
     private TextView[] hourDots;
     private int hourCurrentIndex;
+
+    public static ColumnChartView getTemperatureHourView() {
+        return temperatureHourView;
+    }
+
+    public static ColumnChartView getHumidityHourView() {
+        return humidityHourView;
+    }
 
     private void hourViewInit() {
         ViewPager hourViewPager = (ViewPager) findViewById(R.id.viewpager1);
@@ -161,41 +166,41 @@ public class MainActivity extends Activity {
      * Request
      */
     private RequestHandler requestHandler;
-
     private int[] count;
-    private boolean[] display;
-    private boolean[] request;
+    private int finish;
 
     public int[] getCount() {
         return count;
     }
 
-    public boolean[] getDisplay() {
-        return display;
+    public int getFinish() {
+        return finish;
     }
 
-    public boolean[] getRequest() {
-        return request;
+    public void setFinish(int finish) {
+        this.finish = finish;
     }
 
     private void initRequest() {
         temperatureHour = new ArrayList<>();
         humidityHour = new ArrayList<>();
         hourTime = new ArrayList<>();
-        count = new int[]{0,0,0,0,0};//Hour Day Week Month Year
-        display = new boolean[]{false,false,false,false,false};
-        request = new boolean[]{true,true,true,true,true};
+        count = new int[]{0, 0, 0, 0, 0};//Hour Day Week Month Year
+        finish = 0;
+        requestHandler = new RequestHandler(this);
 
-        for (int i = 0; i < RequestHourService.MAX; i++) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.SECOND, calendar.get(Calendar.SECOND) - delayTime / 1000 * (RequestHourHistory.MAX - 1));
+        for (int i = 0; i < RequestHourHistory.MAX; i++) {
             temperatureHour.add(0.0);
             humidityHour.add(0.0);
             hourTime.add("");
+            requestHistory(calendar, i);
+            calendar.set(Calendar.SECOND, calendar.get(Calendar.SECOND) + delayTime / 1000);
         }
-        requestHandler = new RequestHandler(this);
-        requestTimer.schedule(requestTask, 0, delayTime);
     }
 
-    private void CalRequest(Calendar calendar, int id) {
+    private void requestHistory(Calendar calendar, int id) {
         String ipAddress = "zucc.cloud.thingworx.com:80";
         String appKey = "deaf648e-e691-4e9e-88a9-1a80b21145c3";
         String things = "DHT21Thing";
@@ -206,7 +211,7 @@ public class MainActivity extends Activity {
         Calendar tmp = (Calendar) calendar.clone();
 
         endDate = UTCDateFormat(tmp);
-        tmp.set(Calendar.MINUTE, tmp.get(Calendar.MINUTE) - 30);
+        tmp.set(Calendar.HOUR_OF_DAY, tmp.get(Calendar.HOUR_OF_DAY) - 1);
         startDate = UTCDateFormat(tmp);
 
         service = "QueryPropertyHistory";
@@ -226,12 +231,13 @@ public class MainActivity extends Activity {
         params.put("oldestFirst", "false");
 
         strUrl = addParameter(strUrl, params);
-        RequestHourService requestTemperature = new RequestHourService(this, temperatureHour, humidityHour, hourTime, id);
+        RequestHourHistory requestTemperature = new RequestHourHistory(this, temperatureHour, humidityHour, hourTime, id);
         requestTemperature.execute(strUrl);
     }
 
-    Timer requestTimer = new Timer();
-    TimerTask requestTask = new TimerTask() {
+    private Timer requestTimer = new Timer();
+
+    private TimerTask requestTask = new TimerTask() {
         @Override
         public void run() {
             Message message = new Message();
@@ -240,7 +246,7 @@ public class MainActivity extends Activity {
         }
     };
 
-    static class RequestHandler extends Handler {
+    private static class RequestHandler extends Handler {
         WeakReference<MainActivity> mActivity;
 
         RequestHandler(MainActivity activity) {
@@ -252,177 +258,18 @@ public class MainActivity extends Activity {
             MainActivity theActivity = mActivity.get();
             switch (msg.what) {
                 case 1:
-                    if(theActivity.getRequest()[0]) {
-                        theActivity.getRequest()[0] = false;
-                        Calendar calendar = Calendar.getInstance();
-                        for (int i = 0; i < RequestHourService.MAX; i++) {
-                            theActivity.CalRequest(calendar, i);
-                            calendar.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE) - 1);
-                        }
-                    }
+                    Calendar calendar = Calendar.getInstance();
                     break;
             }
         }
     }
 
-    /**
-     * Receive
-     */
-    ReceiveHandler receiveHandler;
-
-    private void initReceive() {
-        receiveHandler = new ReceiveHandler(this);
-        receiveTimer.schedule(receiveTask, 0, delayTime);
+    public Timer getRequestTimer() {
+        return requestTimer;
     }
 
-    Timer receiveTimer = new Timer();
-    TimerTask receiveTask = new TimerTask() {
-        @Override
-        public void run() {
-            Message message = new Message();
-            message.what = 1;
-            receiveHandler.sendMessage(message);
-        }
-    };
-
-    static class ReceiveHandler extends Handler {
-        WeakReference<MainActivity> mActivity;
-
-        ReceiveHandler(MainActivity activity) {
-            mActivity = new WeakReference<>(activity);
-        }
-
-        @Override
-        public synchronized void handleMessage(Message msg) {
-            MainActivity theActivity = mActivity.get();
-            final float UPTEMP = 30;
-            final float DOWNTEMP = 20;
-            final float UPHUMI = 60;
-            final float DOWNHUMI = 30;
-            final float gold = (float) ((Math.sqrt(5) - 1) / 2);
-            switch (msg.what) {
-                case 1:
-                    if (theActivity.getDisplay()[0]) {//Hour
-                        List<Column> temperatureHourColumnList = new ArrayList<>();
-                        List<SubcolumnValue> temperatureHourValuesList = new ArrayList<>();
-                        Column temperatureHourColumn = new Column(temperatureHourValuesList);
-                        List<AxisValue> temperatureHourAxisValue = new ArrayList<>();
-                        float m = 0;
-                        for (int i = 0; i < theActivity.temperatureHour.size(); i++) {
-                            float tmp = theActivity.temperatureHour.get(i).floatValue();
-                            m = Math.max(m, tmp);
-                            if ((tmp < DOWNTEMP)) {//重写低线
-                                temperatureHourValuesList.add(new SubcolumnValue(tmp, Color.BLUE));
-                            } else if (tmp <= UPTEMP) {//重写中线
-                                temperatureHourValuesList.add(new SubcolumnValue(tmp, Color.GREEN));
-                            } else {//重写高线
-                                temperatureHourValuesList.add(new SubcolumnValue(tmp, Color.RED));
-                            }
-                            temperatureHourColumnList.add(temperatureHourColumn);
-                            try {
-                                temperatureHourAxisValue.add(new AxisValue(i).setLabel(theActivity.hourTime.get(i).substring(11, 19)));
-                            }catch (Exception ex){
-                                System.out.println(theActivity.hourTime.get(i));
-                            }
-                                temperatureHourValuesList = new ArrayList<>();
-                            temperatureHourColumn = new Column(temperatureHourValuesList);
-                        }
-
-                        m = m / gold;
-                        SubcolumnValue ruler = new SubcolumnValue(m, Color.BLACK);
-                        temperatureHourValuesList.add(ruler);
-                        temperatureHourColumnList.add(temperatureHourColumn);
-                        temperatureHourAxisValue.add(new AxisValue(theActivity.temperatureHour.size()).setLabel("Before"));
-                        ColumnChartData temperatureHourData = new ColumnChartData(temperatureHourColumnList);
-
-                        //坐标轴
-                        Axis axisX = new Axis();//X轴
-                        axisX.setHasLines(true);
-                        axisX.setHasTiltedLabels(true);
-                        axisX.setTextColor(Color.WHITE);
-                        axisX.setName("时间(时:分:秒)");
-                        axisX.setMaxLabelChars(6);
-                        axisX.setValues(temperatureHourAxisValue);
-                        temperatureHourData.setAxisXBottom(axisX);
-
-                        Axis axisY1 = new Axis();//Y1轴
-                        axisY1.setHasLines(true);
-                        axisY1.setTextColor(Color.WHITE);
-                        axisY1.setName("摄氏度/℃");
-                        axisY1.setMaxLabelChars(4);
-                        temperatureHourData.setAxisYLeft(axisY1);
-
-                        Axis axisY2 = new Axis();//Y2轴
-                        axisY2.setHasLines(true);
-                        axisY2.setTextColor(Color.WHITE);
-                        axisY2.setName("摄氏度/℃");
-                        axisY2.setMaxLabelChars(4);
-                        temperatureHourData.setAxisYRight(axisY2);
-                        temperatureHourView.setColumnChartData(temperatureHourData);
-
-                        List<Column> humidityHourColumnList = new ArrayList<>();
-                        List<SubcolumnValue> humidityHourValuesList = new ArrayList<>();
-                        Column humidityHourColumn = new Column(humidityHourValuesList);
-                        List<AxisValue> humidityHourAxisValue = new ArrayList<>();
-                        m = 0;
-                        for (int i = 0; i < theActivity.humidityHour.size(); i++) {
-                            float tmp = (theActivity.humidityHour.get(i).floatValue());
-                            m = Math.max(m, tmp);
-                            if ((tmp < DOWNHUMI)) {//重写高线
-                                humidityHourValuesList.add(new SubcolumnValue(tmp, Color.BLUE));
-                            } else if ((tmp >= DOWNHUMI && tmp <= UPHUMI)) {//重写中线
-                                humidityHourValuesList.add(new SubcolumnValue(tmp, Color.GREEN));
-                            } else if (tmp > UPHUMI) {//重写低线
-                                humidityHourValuesList.add(new SubcolumnValue(tmp, Color.RED));
-                            }
-                            humidityHourColumnList.add(humidityHourColumn);
-                            try{
-                                humidityHourAxisValue.add(new AxisValue(i).setLabel(theActivity.hourTime.get(i).substring(11,19)));
-                            }catch (Exception ex){
-                                System.out.println(theActivity.hourTime.get(i));
-                            }
-                            humidityHourValuesList = new ArrayList<>();
-                            humidityHourColumn = new Column(humidityHourValuesList);
-                        }
-                        m = m / gold;
-                        ruler = new SubcolumnValue(m, Color.BLACK);
-                        humidityHourValuesList.add(ruler);
-                        humidityHourColumnList.add(humidityHourColumn);
-                        humidityHourAxisValue.add(new AxisValue(theActivity.humidityHour.size()).setLabel("Before"));
-                        ColumnChartData humidityHourData = new ColumnChartData(humidityHourColumnList);
-
-                        //坐标轴
-                        axisX = new Axis();//X轴
-                        axisX.setHasLines(true);
-                        axisX.setHasTiltedLabels(true);
-                        axisX.setTextColor(Color.WHITE);
-                        axisX.setName("时间(时:分:秒)");
-                        axisX.setMaxLabelChars(6);
-                        axisX.setValues(humidityHourAxisValue);
-                        humidityHourData.setAxisXBottom(axisX);
-
-                        axisY1 = new Axis();//Y1轴
-                        axisY1.setHasLines(true);
-                        axisY1.setTextColor(Color.WHITE);
-                        axisY1.setName("湿度/%RH");
-                        axisY1.setMaxLabelChars(4);
-                        humidityHourData.setAxisYLeft(axisY1);
-
-                        axisY2 = new Axis();//Y2轴
-                        axisY2.setHasLines(true);
-                        axisY2.setTextColor(Color.WHITE);
-                        axisY2.setName("湿度/%RH");
-                        axisY2.setMaxLabelChars(4);
-                        humidityHourData.setAxisYRight(axisY2);
-                        humidityHourView.setColumnChartData(humidityHourData);
-
-                        theActivity.getCount()[0] = 0;
-                        theActivity.getDisplay()[0] = false;
-                        theActivity.getRequest()[0] = true;
-                    }
-
-            }
-        }
+    public TimerTask getRequestTask() {
+        return requestTask;
     }
 
     /**
