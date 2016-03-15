@@ -1,4 +1,4 @@
-package ubibots.getthemsgv2;
+package ubibots.weatherbase;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

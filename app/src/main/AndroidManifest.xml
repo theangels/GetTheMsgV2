@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ubibots.getthemsgv2" >
+    package="ubibots.weatherbase">
 
     <application
         android:allowBackup="true"

@@ -1,14 +1,14 @@
 /**
  * @Means 一次性获取历史数据
  */
-package ubibots.getthemsgv2;
+package ubibots.weatherbase.control;
 
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -21,28 +21,27 @@ import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Column;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.SubcolumnValue;
+import ubibots.weatherbase.MainActivity;
+import ubibots.weatherbase.model.TabMessage;
+import ubibots.weatherbase.ui.HourView;
 
-public class RequestHourHistory extends AsyncTask<String, Integer, String> {
-    private ArrayList<Double> temperatureHour;//一小时内温度
-    private ArrayList<Double> humidityHour;//一小时内湿度
-    private ArrayList<String> hourTime;//一小时内时间
-    private int id;
-    private String strURL;
-    private MainActivity theActivity;
+public class RequestHourHistory_Call extends AsyncTask<String, Integer, String> {
     public final static int MAX = 120;
+    private final static int MAXTIME = 3;
     final float UPTEMP = 30;
     final float DOWNTEMP = 20;
     final float UPHUMI = 60;
     final float DOWNHUMI = 30;
     final float gold = (float) ((Math.sqrt(5) - 1) / 2);
+    private TabMessage hour;
+    private int id;
+    private String strURL;
+    private int time;
 
-    RequestHourHistory(MainActivity activity, ArrayList<Double> temperatureHour, ArrayList<Double> humidityHour, ArrayList<String> hourTime, int id) {
-        WeakReference<MainActivity> mActivity = new WeakReference<>(activity);
-        theActivity = mActivity.get();
-        this.temperatureHour = temperatureHour;
-        this.humidityHour = humidityHour;
-        this.hourTime = hourTime;
+    public RequestHourHistory_Call(TabMessage hour, int id, int time) {
+        this.hour = hour;
         this.id = id;
+        this.time = time;
     }
 
     //该方法并不运行在UI线程当中，主要用于异步操作，所有在该方法中不能对UI当中的空间进行设置和修改
@@ -77,7 +76,7 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
     //在doInBackground方法执行结束之后在运行，并且运行在UI线程当中 可以对UI空间进行设置
     @Override
     protected void onPostExecute(String result) {
-        if (result != null) {
+        if (result != null && time < MAXTIME) {
             Pattern pattern = Pattern.compile("<TD>(.*?)</TD>");
             Matcher matcher = pattern.matcher(result);
             ArrayList<String> tmp = new ArrayList<>();
@@ -90,9 +89,7 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
                 double humi = toDouble(tmp.get(2));
 
                 if (t.length() != 24 || temp <= 0 || humi <= 0) {//丢包重发
-                    RequestHourHistory another = new RequestHourHistory(theActivity, temperatureHour, humidityHour, hourTime, id);
-                    System.out.println(strURL);
-                    another.execute(strURL);
+                    reconnect();
                     return;
                 }
                 int GT = (int) toDouble(t.substring(11, 13)) + 8;
@@ -105,25 +102,21 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
                     t += "0";
                 }
                 t += GT + all.substring(13, all.length());
-                hourTime.set(id, t);
-                temperatureHour.set(id, temp);
-                humidityHour.set(id, humi);
-                theActivity.getCount()[0]++;
-                if (theActivity.getCount()[0] == 120) {//历史数据收集完毕
-                    reflashView();
-                    theActivity.setFinish(theActivity.getFinish() + 1);
-                    if (theActivity.getFinish() == 5) {
-                        theActivity.getRequestTimer().schedule(theActivity.getRequestTask(), 0, theActivity.getDelayTime());
-                    }
+                hour.getDate().set(id, t);
+                hour.getTemperature().set(id, temp);
+                hour.getHumidity().set(id, humi);
+                hour.count++;
+                if (hour.count == 120) {//历史数据收集完毕
+                    reflashView();//刷新界面
+                    //准备启动步进请求
                 }
-                System.out.println("Time: " + hourTime.get(id) + " " + "Temperature: " + temperatureHour.get(id) + " " + "Humidity: " + humidityHour.get(id) + " " + "Num: " + id + " " + "Count: " + theActivity.getCount()[0]);
+                System.out.println("Time: " + hour.getDate().get(id) + " " + "Temperature: " + hour.getTemperature().get(id) + " " + "Humidity: " + hour.getHumidity().get(id) + " " + "Num: " + id + " " + "Count: " + hour.count);
             } else {//丢包重发
-                RequestHourHistory another = new RequestHourHistory(theActivity, temperatureHour, humidityHour, hourTime, id);
-                System.out.println(strURL);
-                another.execute(strURL);
+                reconnect();
             }
+        } else {
+            connectFailed();
         }
-
     }
 
     //该方法运行在UI线程当中,并且运行在UI线程当中 可以对UI空间进行设置
@@ -160,8 +153,8 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
         Column temperatureHourColumn = new Column(temperatureHourValuesList);
         List<AxisValue> temperatureHourAxisValue = new ArrayList<>();
         float m = 0;
-        for (int i = 0; i < temperatureHour.size(); i++) {
-            float tmp = temperatureHour.get(i).floatValue();
+        for (int i = 0; i < hour.getTemperature().size(); i++) {
+            float tmp = hour.getTemperature().get(i).floatValue();
             m = Math.max(m, tmp);
             if ((tmp < DOWNTEMP)) {//重写低线
                 temperatureHourValuesList.add(new SubcolumnValue(tmp, Color.BLUE));
@@ -172,9 +165,9 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
             }
             temperatureHourColumnList.add(temperatureHourColumn);
             try {
-                temperatureHourAxisValue.add(new AxisValue(i).setLabel(hourTime.get(i).substring(11, 19)));
+                temperatureHourAxisValue.add(new AxisValue(i).setLabel(hour.getDate().get(i).substring(11, 19)));
             } catch (Exception ex) {
-                System.out.println(hourTime.get(i));
+                ex.printStackTrace();
             }
             temperatureHourValuesList = new ArrayList<>();
             temperatureHourColumn = new Column(temperatureHourValuesList);
@@ -184,7 +177,7 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
         SubcolumnValue ruler = new SubcolumnValue(m, Color.BLACK);
         temperatureHourValuesList.add(ruler);
         temperatureHourColumnList.add(temperatureHourColumn);
-        temperatureHourAxisValue.add(new AxisValue(temperatureHour.size()).setLabel("Before"));
+        temperatureHourAxisValue.add(new AxisValue(hour.getTemperature().size()).setLabel("Before"));
         ColumnChartData temperatureHourData = new ColumnChartData(temperatureHourColumnList);
 
         //坐标轴
@@ -210,15 +203,15 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
         axisY2.setName("摄氏度/℃");
         axisY2.setMaxLabelChars(4);
         temperatureHourData.setAxisYRight(axisY2);
-        MainActivity.getTemperatureHourView().setColumnChartData(temperatureHourData);
+        HourView.getTemperatureHourView().setColumnChartData(temperatureHourData);
 
         List<Column> humidityHourColumnList = new ArrayList<>();
         List<SubcolumnValue> humidityHourValuesList = new ArrayList<>();
         Column humidityHourColumn = new Column(humidityHourValuesList);
         List<AxisValue> humidityHourAxisValue = new ArrayList<>();
         m = 0;
-        for (int i = 0; i < humidityHour.size(); i++) {
-            float tmp = (humidityHour.get(i).floatValue());
+        for (int i = 0; i < hour.getHumidity().size(); i++) {
+            float tmp = (hour.getHumidity().get(i).floatValue());
             m = Math.max(m, tmp);
             if ((tmp < DOWNHUMI)) {//重写高线
                 humidityHourValuesList.add(new SubcolumnValue(tmp, Color.BLUE));
@@ -229,9 +222,9 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
             }
             humidityHourColumnList.add(humidityHourColumn);
             try {
-                humidityHourAxisValue.add(new AxisValue(i).setLabel(hourTime.get(i).substring(11, 19)));
+                humidityHourAxisValue.add(new AxisValue(i).setLabel(hour.getDate().get(i).substring(11, 19)));
             } catch (Exception ex) {
-                System.out.println(hourTime.get(i));
+                System.out.println(hour.getDate().get(i));
             }
             humidityHourValuesList = new ArrayList<>();
             humidityHourColumn = new Column(humidityHourValuesList);
@@ -240,7 +233,7 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
         ruler = new SubcolumnValue(m, Color.BLACK);
         humidityHourValuesList.add(ruler);
         humidityHourColumnList.add(humidityHourColumn);
-        humidityHourAxisValue.add(new AxisValue(humidityHour.size()).setLabel("Before"));
+        humidityHourAxisValue.add(new AxisValue(hour.getHumidity().size()).setLabel("Before"));
         ColumnChartData humidityHourData = new ColumnChartData(humidityHourColumnList);
 
         //坐标轴
@@ -266,6 +259,18 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
         axisY2.setName("湿度/%RH");
         axisY2.setMaxLabelChars(4);
         humidityHourData.setAxisYRight(axisY2);
-        MainActivity.getHumidityHourView().setColumnChartData(humidityHourData);
+        HourView.getHumidityHourView().setColumnChartData(humidityHourData);
+    }
+
+    private void connectFailed() {
+        Toast.makeText(MainActivity.context, "连接失败，请检查网络环境并重启本程序...",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    private void reconnect() {
+        RequestHourHistory_Call another = new RequestHourHistory_Call(hour, id, time + 1);
+        System.out.println("time: " + time);
+        System.out.println(strURL);
+        another.execute(strURL);
     }
 }
