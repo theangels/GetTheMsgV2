@@ -2,6 +2,8 @@ package ubibots.weatherbase.ui;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Spannable;
@@ -13,26 +15,38 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import lecho.lib.hellocharts.gesture.ContainerScrollType;
 import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.view.ColumnChartView;
 import ubibots.weatherbase.MainActivity;
 import ubibots.weatherbase.R;
+import ubibots.weatherbase.control.RequestHour;
 import ubibots.weatherbase.control.RequestHourHistory;
-import ubibots.weatherbase.control.RequestHourHistory_Call;
+import ubibots.weatherbase.model.Border;
+import ubibots.weatherbase.model.ColumnView;
 import ubibots.weatherbase.model.TabMessage;
 
 
 public class HourView {
-    private static ColumnChartView temperatureHourView;
-    private static ColumnChartView humidityHourView;
+    private static ColumnView hourColumnView;
+    private TabMessage hour;
+    private RequestHour requestHour;
     private List<View> hourViewList;
     private TextView[] hourDots;
     private int hourCurrentIndex;
+    private static RequestHourHandler requestHourHandler;
+
+    public static ColumnView getHourColumnView() {
+        return hourColumnView;
+    }
+
     private PagerAdapter hourPagerAdapter = new PagerAdapter() {
         //官方建议这么写
         @Override
@@ -64,47 +78,42 @@ public class HourView {
     public HourView() {
         hourViewInit();
 
-        TabMessage hour = new TabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>());
-        RequestHourHistory requestHourHistory = new RequestHourHistory();
+        hour = new TabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>());
+        requestHour = new RequestHour();
         Calendar hourCalendar = Calendar.getInstance();
-        hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) - TabMessage.delay / 1000 * (RequestHourHistory_Call.MAX - 1));
-        for (int i = 0; i < RequestHourHistory_Call.MAX; i++) {
+        hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) - Border.delay / 1000 * (RequestHourHistory.MAX - 1));
+        for (int i = 0; i < RequestHourHistory.MAX; i++) {
             hour.getTemperature().add(0.0);
             hour.getHumidity().add(0.0);
             hour.getDate().add("");
-            requestHourHistory.hourHistory(hour, hourCalendar, i);
-            hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) + TabMessage.delay / 1000);
+            requestHour.hourHistory(hour, hourCalendar, i);
+            hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) + Border.delay / 1000);
         }
 
         Toast.makeText(MainActivity.context, "正在获取数据中,请耐心等待...",
                 Toast.LENGTH_LONG).show();
     }
 
-    public static ColumnChartView getTemperatureHourView() {
-        return temperatureHourView;
-    }
-
-    public static ColumnChartView getHumidityHourView() {
-        return humidityHourView;
-    }
-
     private void hourViewInit() {
         ViewPager hourViewPager = (ViewPager) MainActivity.activity.findViewById(R.id.viewpager1);
         hourViewList = new ArrayList<>();
         View view1 = View.inflate(MainActivity.context, R.layout.temperaturehour, null);
-        temperatureHourView = (ColumnChartView) view1.findViewById(R.id.temperaturehour);
+        ColumnChartView temperatureHourView = (ColumnChartView) view1.findViewById(R.id.temperaturehour);
         temperatureHourView.setInteractive(false);
         temperatureHourView.setZoomType(ZoomType.HORIZONTAL);
         temperatureHourView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
         temperatureHourView.setVisibility(View.VISIBLE);
         View view2 = View.inflate(MainActivity.context, R.layout.humidityhour, null);
-        humidityHourView = (ColumnChartView) view2.findViewById(R.id.humidityhour);
+        ColumnChartView humidityHourView = (ColumnChartView) view2.findViewById(R.id.humidityhour);
         humidityHourView.setInteractive(false);
         humidityHourView.setZoomType(ZoomType.HORIZONTAL);
         humidityHourView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
         humidityHourView.setVisibility(View.VISIBLE);
         hourViewList.add(view1);
         hourViewList.add(view2);
+        hourColumnView = new ColumnView(temperatureHourView, humidityHourView);
+
+        requestHourHandler = new RequestHourHandler(this);
 
         initHourDots();
         hourViewPager.setAdapter(hourPagerAdapter);
@@ -162,6 +171,44 @@ public class HourView {
             tv.append("温度");
         } else {
             tv.append("湿度");
+        }
+    }
+
+    private static Timer requestHourTimer = new Timer();
+    private static TimerTask requestHourTask = new TimerTask() {
+
+        @Override
+        public void run() {
+            // 需要做的事:发送消息
+            Message message = new Message();
+            message.what = 1;
+            requestHourHandler.sendMessage(message);
+        }
+    };
+
+    public static Timer getRequestHourTimer() {
+        return requestHourTimer;
+    }
+
+    public static TimerTask getRequestHourTask() {
+        return requestHourTask;
+    }
+
+    static class RequestHourHandler extends Handler{
+
+        WeakReference<HourView> mHourView;
+
+        RequestHourHandler(HourView  hourView) {
+            mHourView = new WeakReference<>(hourView);
+        }
+
+        public void handleMessage(Message msg) {
+            HourView theHourView = mHourView.get();
+            if (msg.what == 1) {
+                Calendar calendar = Calendar.getInstance();
+                theHourView.requestHour.hourStep(theHourView.hour,calendar);
+            }
+            super.handleMessage(msg);
         }
     }
 }
