@@ -1,12 +1,11 @@
 package ubibots.weatherbase.control;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import ubibots.weatherbase.model.TabMessage;
+import ubibots.weatherbase.util.RequestUtil;
 
 public class RequestHourHistory {
 
@@ -20,9 +19,9 @@ public class RequestHourHistory {
         String endDate;
         Calendar tmp = (Calendar) calendar.clone();
 
-        endDate = UTCDateFormat(tmp);
+        endDate = RequestUtil.UTCDateFormat(tmp);
         tmp.set(Calendar.YEAR, tmp.get(Calendar.YEAR) - 1);
-        startDate = UTCDateFormat(tmp);
+        startDate = RequestUtil.UTCDateFormat(tmp);
 
         service = "QueryPropertyHistory";
         strUrl = "http://"
@@ -40,38 +39,8 @@ public class RequestHourHistory {
         params.put("maxItems", "1");
         params.put("oldestFirst", "false");
 
-        strUrl = addParameter(strUrl, params);
+        strUrl = RequestUtil.addParameter(strUrl, params);
         RequestHourHistory_Call requestTemperature = new RequestHourHistory_Call(hour, id, 0);
         requestTemperature.execute(strUrl);
-    }
-
-    private String addParameter(String path, Map<String, String> params) {
-        String URL = path;
-        if (params != null && URL.length() != 0) {
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                try {
-                    URL += entry.getKey() + "=" + entry.getValue();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                URL += "&";
-            }
-            URL = URL.substring(0, URL.length() - 1);
-        }
-        return URL;
-    }
-
-    private String UTCDateFormat(Calendar calendar) {
-        String UTCDate;
-        SimpleDateFormat sdf;
-        Calendar tmp = (Calendar) calendar.clone();
-        tmp.set(Calendar.HOUR_OF_DAY, tmp.get(Calendar.HOUR_OF_DAY) - 8);
-        sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        UTCDate = sdf.format(tmp.getTime()) + "T";
-        sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-        UTCDate += sdf.format(tmp.getTime()) + ".";
-        sdf = new SimpleDateFormat("SSS", Locale.getDefault());
-        UTCDate += sdf.format(tmp.getTime()) + "Z";
-        return UTCDate;
     }
 }
