@@ -12,10 +12,10 @@ import android.text.style.ImageSpan;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -36,15 +36,25 @@ import ubibots.weatherbase.model.TabMessage;
 
 public class HourView {
     private static ColumnView hourColumnView;
-    private TabMessage hour;
-    private RequestHour requestHour;
-    private List<View> hourViewList;
-    private TextView[] hourDots;
-    private int hourCurrentIndex;
+    private static TabMessage hour;
+    private static RequestHour requestHour;
+    private static List<View> hourViewList;
+    private static TextView[] hourDots;
+    private static int hourCurrentIndex;
     private static RequestHourHandler requestHourHandler;
+    private static ViewPager hourViewPager;
+    private static ProgressBar hourProgressBar;
 
     public static ColumnView getHourColumnView() {
         return hourColumnView;
+    }
+
+    public static ViewPager getHourViewPager() {
+        return hourViewPager;
+    }
+
+    public static ProgressBar getHourProgressBar() {
+        return hourProgressBar;
     }
 
     private PagerAdapter hourPagerAdapter = new PagerAdapter() {
@@ -95,7 +105,7 @@ public class HourView {
     }
 
     private void hourViewInit() {
-        ViewPager hourViewPager = (ViewPager) MainActivity.activity.findViewById(R.id.viewpager1);
+        hourViewPager = (ViewPager) MainActivity.activity.findViewById(R.id.hourView);
         hourViewList = new ArrayList<>();
         View view1 = View.inflate(MainActivity.context, R.layout.temperaturehour, null);
         ColumnChartView temperatureHourView = (ColumnChartView) view1.findViewById(R.id.temperaturehour);
@@ -113,7 +123,7 @@ public class HourView {
         hourViewList.add(view2);
         hourColumnView = new ColumnView(temperatureHourView, humidityHourView);
 
-        requestHourHandler = new RequestHourHandler(this);
+        requestHourHandler = new RequestHourHandler();
 
         initHourDots();
         hourViewPager.setAdapter(hourPagerAdapter);
@@ -131,6 +141,8 @@ public class HourView {
             public void onPageScrollStateChanged(int arg0) {
             }
         });
+
+        hourProgressBar = (ProgressBar)MainActivity.activity.findViewById(R.id.hourProgress);
     }
 
     /**
@@ -195,18 +207,10 @@ public class HourView {
     }
 
     static class RequestHourHandler extends Handler{
-
-        WeakReference<HourView> mHourView;
-
-        RequestHourHandler(HourView  hourView) {
-            mHourView = new WeakReference<>(hourView);
-        }
-
         public void handleMessage(Message msg) {
-            HourView theHourView = mHourView.get();
             if (msg.what == 1) {
                 Calendar calendar = Calendar.getInstance();
-                theHourView.requestHour.hourStep(theHourView.hour,calendar);
+                requestHour.hourStep(hour,calendar);
             }
             super.handleMessage(msg);
         }

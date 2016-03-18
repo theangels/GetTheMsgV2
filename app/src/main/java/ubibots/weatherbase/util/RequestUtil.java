@@ -87,7 +87,7 @@ public class RequestUtil {
         SubcolumnValue ruler = new SubcolumnValue(m, Color.BLACK);
         temperatureHourValuesList.add(ruler);
         temperatureHourColumnList.add(temperatureHourColumn);
-        temperatureHourAxisValue.add(new AxisValue(tab.getTemperature().size()).setLabel("Before"));
+        temperatureHourAxisValue.add(new AxisValue(tab.getTemperature().size()).setLabel(""));
         ColumnChartData temperatureHourData = new ColumnChartData(temperatureHourColumnList);
 
         //坐标轴
@@ -143,7 +143,7 @@ public class RequestUtil {
         ruler = new SubcolumnValue(m, Color.BLACK);
         humidityHourValuesList.add(ruler);
         humidityHourColumnList.add(humidityHourColumn);
-        humidityHourAxisValue.add(new AxisValue(tab.getHumidity().size()).setLabel("Before"));
+        humidityHourAxisValue.add(new AxisValue(tab.getHumidity().size()).setLabel(""));
         ColumnChartData humidityHourData = new ColumnChartData(humidityHourColumnList);
 
         //坐标轴

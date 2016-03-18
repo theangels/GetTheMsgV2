@@ -4,6 +4,7 @@
 package ubibots.weatherbase.control;
 
 import android.os.AsyncTask;
+import android.view.View;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -96,7 +97,9 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
                 if (hour.count == 120) {//历史数据收集完毕
                     RequestUtil.reflashColumView(HourView.getHourColumnView(), hour, "时:分:秒");//刷新界面
                     HourView.getRequestHourTimer().schedule(HourView.getRequestHourTask(), 0, Border.delay);
+                    HourView.getHourProgressBar().setVisibility(View.GONE);
                 }
+                HourView.getHourProgressBar().setProgress(100 * hour.count / MAX);
                 System.out.println("Time: " + hour.getDate().get(id) + " " + "Temperature: " + hour.getTemperature().get(id) + " " + "Humidity: " + hour.getHumidity().get(id) + " " + "Num: " + id + " " + "Count: " + hour.count + " " + "Time: " + time);
             } else {//丢包重发
                 reconnect(strURL, hour, id);
