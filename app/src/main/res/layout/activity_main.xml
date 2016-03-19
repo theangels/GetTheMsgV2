@@ -12,7 +12,7 @@
         android:layout_weight="1.0">
 
         <ProgressBar
-            android:id="@+id/hourProgress"
+            android:id="@+id/hourProgressBar"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             style="?android:attr/progressBarStyleHorizontal"

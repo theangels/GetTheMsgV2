@@ -142,7 +142,7 @@ public class HourView {
             }
         });
 
-        hourProgressBar = (ProgressBar)MainActivity.activity.findViewById(R.id.hourProgress);
+        hourProgressBar = (ProgressBar)MainActivity.activity.findViewById(R.id.hourProgressBar);
     }
 
     /**
