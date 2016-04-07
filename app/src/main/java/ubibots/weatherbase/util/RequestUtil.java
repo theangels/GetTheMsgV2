@@ -130,8 +130,9 @@ public class RequestUtil {
         temperatureLine = new Line(temperatureValuesList).setColor(Color.BLACK).setCubic(false);
         temperatureLine.setHasPoints(false);
         temperatureLine.setHasLines(false);
-        temperatureValuesList.add(new PointValue(0, maxTemperature + 10));
-        temperatureValuesList.add(new PointValue(1, minTemperature - 10));
+        float mm = maxTemperature - minTemperature;
+        temperatureValuesList.add(new PointValue(0, maxTemperature + mm));
+        temperatureValuesList.add(new PointValue(1, minTemperature - mm));
         temperatureLineList.add(temperatureLine);
 
         LineChartData temperatureData = new LineChartData();
@@ -232,8 +233,9 @@ public class RequestUtil {
         humidityLine = new Line(humidityValuesList).setColor(Color.BLACK).setCubic(false);
         humidityLine.setHasPoints(false);
         humidityLine.setHasLines(false);
-        humidityValuesList.add(new PointValue(0, maxHumidity + 10));
-        humidityValuesList.add(new PointValue(1, minHumidity - 10));
+        mm = maxHumidity - minHumidity;
+        humidityValuesList.add(new PointValue(0, maxHumidity + mm));
+        humidityValuesList.add(new PointValue(1, minHumidity - mm));
         humidityLineList.add(humidityLine);
 
         LineChartData humidityData = new LineChartData();
