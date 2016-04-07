@@ -130,10 +130,8 @@ public class RequestUtil {
         temperatureLine = new Line(temperatureValuesList).setColor(Color.BLACK).setCubic(false);
         temperatureLine.setHasPoints(false);
         temperatureLine.setHasLines(false);
-        maxTemperature = maxTemperature / BeanConstant.gold;
-        minTemperature = minTemperature * BeanConstant.gold;
-        temperatureValuesList.add(new PointValue(0, maxTemperature));
-        temperatureValuesList.add(new PointValue(1, minTemperature));
+        temperatureValuesList.add(new PointValue(0, maxTemperature + 10));
+        temperatureValuesList.add(new PointValue(1, minTemperature - 10));
         temperatureLineList.add(temperatureLine);
 
         LineChartData temperatureData = new LineChartData();
@@ -234,10 +232,8 @@ public class RequestUtil {
         humidityLine = new Line(humidityValuesList).setColor(Color.BLACK).setCubic(false);
         humidityLine.setHasPoints(false);
         humidityLine.setHasLines(false);
-        maxHumidity = maxHumidity / BeanConstant.gold;
-        minHumidity = minHumidity * BeanConstant.gold;
-        humidityValuesList.add(new PointValue(0, maxHumidity));
-        humidityValuesList.add(new PointValue(1, minHumidity));
+        humidityValuesList.add(new PointValue(0, maxHumidity + 10));
+        humidityValuesList.add(new PointValue(1, minHumidity - 10));
         humidityLineList.add(humidityLine);
 
         LineChartData humidityData = new LineChartData();
