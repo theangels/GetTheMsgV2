@@ -13,18 +13,18 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ubibots.weatherbase.model.Border;
-import ubibots.weatherbase.model.TabMessage;
+import ubibots.weatherbase.model.BeanConstant;
+import ubibots.weatherbase.model.BeanTabMessage;
 import ubibots.weatherbase.ui.HourView;
 import ubibots.weatherbase.util.RequestUtil;
 
 public class RequestHourStep extends AsyncTask<String, Integer, String> {
     public final static int MAX = 120;
-    private TabMessage hour;
+    private BeanTabMessage hour;
     private String strURL;
     private int time;
 
-    public RequestHourStep(TabMessage hour, int time) {
+    public RequestHourStep(BeanTabMessage hour, int time) {
         this.hour = hour;
         this.time = time;
     }
@@ -61,7 +61,7 @@ public class RequestHourStep extends AsyncTask<String, Integer, String> {
     //在doInBackground方法执行结束之后在运行，并且运行在UI线程当中 可以对UI空间进行设置
     @Override
     protected void onPostExecute(String result) {
-        if (result != null && time < Border.MAXTIME) {
+        if (result != null && time < BeanConstant.MAXTIME) {
             Pattern pattern = Pattern.compile("<TD>(.*?)</TD>");
             Matcher matcher = pattern.matcher(result);
             ArrayList<String> tmp = new ArrayList<>();
@@ -70,14 +70,14 @@ public class RequestHourStep extends AsyncTask<String, Integer, String> {
             }
             if (tmp.size() >= 3) {
                 String date = tmp.get(0);
-                double temp = toDouble(tmp.get(1));
-                double humi = toDouble(tmp.get(2));
+                double temp = Double.valueOf(tmp.get(1));
+                double humi = Double.valueOf(tmp.get(2));
 
                 if (date.length() != 24 || temp <= 0 || humi <= 0) {//丢包重发
                     reconnect(strURL, hour);
                     return;
                 }
-                int GT = (int) toDouble(date.substring(11, 13)) + 8;
+                int GT = Double.valueOf(date.substring(11,13)).intValue() + 8;
                 if (GT >= 24) {
                     GT -= 24;
                 }
@@ -93,7 +93,7 @@ public class RequestHourStep extends AsyncTask<String, Integer, String> {
                 hour.getTemperature().add(temp);
                 hour.getHumidity().remove(0);
                 hour.getHumidity().add(humi);
-                RequestUtil.reflashColumView(HourView.getHourColumnView(), hour, "时:分:秒");//刷新界面
+                RequestUtil.reflashLineView(HourView.getHourBeanLineView(), hour, "时:分:秒");//刷新界面
                 System.out.println("Time: " + hour.getDate().get(RequestHourStep.MAX - 1) + " " + "Temperature: " + hour.getTemperature().get(RequestHourStep.MAX - 1) + " " + "Humidity: " + hour.getHumidity().get(RequestHourStep.MAX - 1) + " " + "Time: " + time);
             } else {//丢包重发
                 reconnect(strURL, hour);
@@ -108,30 +108,8 @@ public class RequestHourStep extends AsyncTask<String, Integer, String> {
     protected void onPreExecute() {
     }
 
-    private double toDouble(String init) {
-        double ret = 0;
-        if (init != null) {
-            double mult = 1;
-            for (int i = 0; i < init.length(); i++) {
-                if (init.charAt(i) != '.') {
-                    if (mult >= 0.5) {
-                        ret = ret * mult + init.charAt(i) - '0';
-                        mult *= 10;
-                    } else {
-                        ret = ret + (init.charAt(i) - '0') * mult;
-                        mult *= 0.01;
-                    }
-                } else {
-                    mult = 0.1;
-                }
-            }
-            int ch = (int) (ret * 10);
-            ret = (double) ch / 10;
-        }
-        return ret;
-    }
 
-    public void reconnect(String strURL, TabMessage hour) {
+    public void reconnect(String strURL, BeanTabMessage hour) {
         RequestHourStep another = new RequestHourStep(hour, time + 1);
         System.out.println("time: " + time);
         System.out.println(strURL);

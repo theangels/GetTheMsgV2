@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <lecho.lib.hellocharts.view.ColumnChartView
+    <lecho.lib.hellocharts.view.LineChartView
         android:id="@+id/temperaturehour"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

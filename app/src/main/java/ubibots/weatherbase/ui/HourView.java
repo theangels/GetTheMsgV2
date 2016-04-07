@@ -25,18 +25,19 @@ import java.util.TimerTask;
 import lecho.lib.hellocharts.gesture.ContainerScrollType;
 import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.view.ColumnChartView;
+import lecho.lib.hellocharts.view.LineChartView;
 import ubibots.weatherbase.MainActivity;
 import ubibots.weatherbase.R;
 import ubibots.weatherbase.control.RequestHour;
 import ubibots.weatherbase.control.RequestHourHistory;
-import ubibots.weatherbase.model.Border;
-import ubibots.weatherbase.model.ColumnView;
-import ubibots.weatherbase.model.TabMessage;
+import ubibots.weatherbase.model.BeanConstant;
+import ubibots.weatherbase.model.BeanLineView;
+import ubibots.weatherbase.model.BeanTabMessage;
 
 
 public class HourView {
-    private static ColumnView hourColumnView;
-    private static TabMessage hour;
+    private static BeanLineView hourBeanLineView;
+    private static BeanTabMessage hour;
     private static RequestHour requestHour;
     private static List<View> hourViewList;
     private static TextView[] hourDots;
@@ -45,8 +46,8 @@ public class HourView {
     private static ViewPager hourViewPager;
     private static ProgressBar hourProgressBar;
 
-    public static ColumnView getHourColumnView() {
-        return hourColumnView;
+    public static BeanLineView getHourBeanLineView() {
+        return hourBeanLineView;
     }
 
     public static ViewPager getHourViewPager() {
@@ -88,16 +89,16 @@ public class HourView {
     public HourView() {
         hourViewInit();
 
-        hour = new TabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>());
+        hour = new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>());
         requestHour = new RequestHour();
         Calendar hourCalendar = Calendar.getInstance();
-        hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) - Border.delay / 1000 * (RequestHourHistory.MAX - 1));
+        hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) - BeanConstant.delay / 1000 * (RequestHourHistory.MAX - 1));
         for (int i = 0; i < RequestHourHistory.MAX; i++) {
             hour.getTemperature().add(0.0);
             hour.getHumidity().add(0.0);
             hour.getDate().add("");
             requestHour.hourHistory(hour, hourCalendar, i);
-            hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) + Border.delay / 1000);
+            hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) + BeanConstant.delay / 1000);
         }
 
         Toast.makeText(MainActivity.context, "正在获取数据中,请耐心等待...",
@@ -108,20 +109,20 @@ public class HourView {
         hourViewPager = (ViewPager) MainActivity.activity.findViewById(R.id.hourView);
         hourViewList = new ArrayList<>();
         View view1 = View.inflate(MainActivity.context, R.layout.temperaturehour, null);
-        ColumnChartView temperatureHourView = (ColumnChartView) view1.findViewById(R.id.temperaturehour);
+        LineChartView temperatureHourView = (LineChartView) view1.findViewById(R.id.temperaturehour);
         temperatureHourView.setInteractive(false);
         temperatureHourView.setZoomType(ZoomType.HORIZONTAL);
         temperatureHourView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
         temperatureHourView.setVisibility(View.VISIBLE);
         View view2 = View.inflate(MainActivity.context, R.layout.humidityhour, null);
-        ColumnChartView humidityHourView = (ColumnChartView) view2.findViewById(R.id.humidityhour);
+        LineChartView humidityHourView = (LineChartView) view2.findViewById(R.id.humidityhour);
         humidityHourView.setInteractive(false);
         humidityHourView.setZoomType(ZoomType.HORIZONTAL);
         humidityHourView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
         humidityHourView.setVisibility(View.VISIBLE);
         hourViewList.add(view1);
         hourViewList.add(view2);
-        hourColumnView = new ColumnView(temperatureHourView, humidityHourView);
+        hourBeanLineView = new BeanLineView(temperatureHourView, humidityHourView);
 
         requestHourHandler = new RequestHourHandler();
 
