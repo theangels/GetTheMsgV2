@@ -5,17 +5,17 @@ import java.util.Calendar;
 import ubibots.weatherbase.model.BeanTabMessage;
 import ubibots.weatherbase.util.RequestUtil;
 
-public class RequestHour {
+public class RequestDay {
 
-    public void hourHistory(BeanTabMessage hour, Calendar calendar, int id) {
+    public void dayHistory(BeanTabMessage day, Calendar calendar, int id) {
         String strUrl = RequestUtil.combineUrl((Calendar) calendar.clone());
-        RequestHourHistory request = new RequestHourHistory(hour, id, 0);
+        RequestDayHistory request = new RequestDayHistory(day, id, 0);
         request.execute(strUrl);
     }
 
-    public void hourStep(BeanTabMessage hour, Calendar calendar) {
+    public void dayStep(BeanTabMessage day, Calendar calendar) {
         String strUrl = RequestUtil.combineUrl((Calendar) calendar.clone());
-        RequestHourStep request = new RequestHourStep(hour, 0);
+        RequestDayStep request = new RequestDayStep(day, 0);
         request.execute(strUrl);
     }
 }

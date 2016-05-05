@@ -10,7 +10,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,36 +71,40 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
         if (result != null && time < BeanConstant.MAXTIME) {
             Pattern pattern = Pattern.compile("<TD>(.*?)</TD>");
             Matcher matcher = pattern.matcher(result);
+
             ArrayList<String> tmp = new ArrayList<>();
             while (matcher.find()) {
                 tmp.add(matcher.group(1));
             }
+
             if (tmp.size() >= 3) {
-                String date = tmp.get(0);
+                String dateString = tmp.get(0);
                 double temp = Double.valueOf(tmp.get(1));
                 double humi = Double.valueOf(tmp.get(2));
 
-                if (date.length() != 24 || temp <= 0 || humi <= 0) {//丢包重发
+                //丢包重发
+                if (dateString.length() != 24 || temp < 0 || humi < 0) {
                     reconnect(strURL, hour, id);
                     return;
                 }
-                int GT = Double.valueOf(date.substring(11, 13)).intValue() + 8;
-                if (GT >= 24) {
-                    GT -= 24;
-                }
-                String all = tmp.get(0);
-                date = all.substring(0, 11);
-                if (GT < 10) {
-                    date += "0";
-                }
-                date += GT + all.substring(13, all.length());
-                hour.getDate().set(id, date);
+
+                dateString = dateString.substring(0, 10) + " " + dateString.substring(11, 23);
+                Calendar calendar = RequestUtil.dateToCalender(dateString,"yyyy-MM-dd HH:mm:ss.SSS");
+                calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + 8);
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+                dateString = sdf.format(calendar.getTime());
+
+                hour.getDate().set(id, dateString);
                 hour.getTemperature().set(id, temp);
                 hour.getHumidity().set(id, humi);
                 hour.count++;
-                if (hour.count == 120) {//历史数据收集完毕
-                    RequestUtil.reflashLineView(HourView.getHourBeanLineView(), hour, "时:分:秒");//刷新界面
-                    HourView.getRequestHourTimer().schedule(HourView.getRequestHourTask(), 0, BeanConstant.delay);
+
+                //历史数据收集完毕
+                if (hour.count == MAX) {
+                    //刷新界面
+                    RequestUtil.reflashLineView(HourView.getHourBeanLineView(), hour, "时:分:秒");
+
+                    HourView.getRequestHourTimer().schedule(HourView.getRequestHourTask(), 0, BeanConstant.delayHour);
                     HourView.getHourProgressBar().setVisibility(View.GONE);
                 }
                 HourView.getHourProgressBar().setProgress(100 * hour.count / MAX);

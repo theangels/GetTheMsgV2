@@ -18,17 +18,17 @@ import java.util.regex.Pattern;
 
 import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanTabMessage;
-import ubibots.weatherbase.ui.HourView;
+import ubibots.weatherbase.ui.DayView;
 import ubibots.weatherbase.util.RequestUtil;
 
-public class RequestHourStep extends AsyncTask<String, Integer, String> {
-    public final static int MAX = 120;
-    private BeanTabMessage hour;
+public class RequestDayStep extends AsyncTask<String, Integer, String> {
+    public final static int MAX = 48;
+    private BeanTabMessage day;
     private String strURL;
     private int time;
 
-    public RequestHourStep(BeanTabMessage hour, int time) {
-        this.hour = hour;
+    public RequestDayStep(BeanTabMessage day, int time) {
+        this.day = day;
         this.time = time;
     }
 
@@ -77,30 +77,30 @@ public class RequestHourStep extends AsyncTask<String, Integer, String> {
                 double humi = Double.valueOf(tmp.get(2));
 
                 //丢包重发
-                if (dateString.length() != 24 || temp < 0 || humi < 0) {
-                    reconnect(strURL, hour);
+                if (dateString.length() != 24 || temp <= 0 || humi <= 0) {
+                    reconnect(strURL, day);
                     return;
                 }
 
                 dateString = dateString.substring(0, 10) + " " + dateString.substring(11, 23);
                 Calendar calendar = RequestUtil.dateToCalender(dateString,"yyyy-MM-dd HH:mm:ss.SSS");
                 calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + 8);
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+                SimpleDateFormat sdf = new SimpleDateFormat("dd HH:mm", Locale.getDefault());
                 dateString = sdf.format(calendar.getTime());
 
-                hour.getDate().remove(0);
-                hour.getDate().add(dateString);
-                hour.getTemperature().remove(0);
-                hour.getTemperature().add(temp);
-                hour.getHumidity().remove(0);
-                hour.getHumidity().add(humi);
+                day.getDate().remove(0);
+                day.getDate().add(dateString);
+                day.getTemperature().remove(0);
+                day.getTemperature().add(temp);
+                day.getHumidity().remove(0);
+                day.getHumidity().add(humi);
 
                 //刷新界面
-                RequestUtil.reflashLineView(HourView.getHourBeanLineView(), hour, "时:分:秒");
+                RequestUtil.reflashLineView(DayView.getDayBeanLineView(), day, "日 时:分");
 
-                System.out.println("Time: " + hour.getDate().get(MAX - 1) + " " + "Temperature: " + hour.getTemperature().get(MAX - 1) + " " + "Humidity: " + hour.getHumidity().get(MAX - 1) + " " + "Time: " + time);
+                System.out.println("Time: " + day.getDate().get(MAX - 1) + " " + "Temperature: " + day.getTemperature().get(MAX - 1) + " " + "Humidity: " + day.getHumidity().get(MAX - 1) + " " + "Time: " + time);
             } else {//丢包重发
-                reconnect(strURL, hour);
+                reconnect(strURL, day);
             }
         } else {
             RequestUtil.connectFailed();
@@ -113,8 +113,8 @@ public class RequestHourStep extends AsyncTask<String, Integer, String> {
     }
 
 
-    public void reconnect(String strURL, BeanTabMessage hour) {
-        RequestHourStep another = new RequestHourStep(hour, time + 1);
+    public void reconnect(String strURL, BeanTabMessage day) {
+        RequestDayStep another = new RequestDayStep(day, time + 1);
         System.out.println("time: " + time);
         System.out.println(strURL);
         another.execute(strURL);

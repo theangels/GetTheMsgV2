@@ -24,7 +24,6 @@ import java.util.TimerTask;
 
 import lecho.lib.hellocharts.gesture.ContainerScrollType;
 import lecho.lib.hellocharts.gesture.ZoomType;
-import lecho.lib.hellocharts.view.ColumnChartView;
 import lecho.lib.hellocharts.view.LineChartView;
 import ubibots.weatherbase.MainActivity;
 import ubibots.weatherbase.R;
@@ -92,13 +91,13 @@ public class HourView {
         hour = new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>());
         requestHour = new RequestHour();
         Calendar hourCalendar = Calendar.getInstance();
-        hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) - BeanConstant.delay / 1000 * (RequestHourHistory.MAX - 1));
+        hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) - BeanConstant.delayHour / 1000 * (RequestHourHistory.MAX - 1));
         for (int i = 0; i < RequestHourHistory.MAX; i++) {
             hour.getTemperature().add(0.0);
             hour.getHumidity().add(0.0);
             hour.getDate().add("");
             requestHour.hourHistory(hour, hourCalendar, i);
-            hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) + BeanConstant.delay / 1000);
+            hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) + BeanConstant.delayHour / 1000);
         }
 
         Toast.makeText(MainActivity.context, "正在获取数据中,请耐心等待...",

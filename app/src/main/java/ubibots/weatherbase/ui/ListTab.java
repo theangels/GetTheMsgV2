@@ -22,35 +22,31 @@ public class ListTab {
         data.add("每时");
         data.add("每日");
         data.add("每周");
-        data.add("每月");
-        data.add("每年");
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(MainActivity.context, android.R.layout.simple_expandable_list_item_1, data);
         listView.setAdapter(arrayAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String click = data.get(position);
-                if(click.equals("每时")){
-                    hourVisible();
-                }
-                else if(click.equals("每日")){
-                    hourInvisible();
-                }
-                else if(click.equals("每周")){
-                    hourInvisible();
-                }
-                else if(click.equals("每月")){
-                    hourInvisible();
-                }
-                else if(click.equals("每年")){
-                    hourInvisible();
+                switch (click) {
+                    case "每时":
+                        hourVisible();
+                        break;
+                    case "每日":
+                        dayVisible();
+                        break;
+                    case "每周":
+                        hourInvisible();
+                        break;
                 }
             }
         });
+        hourVisible();
     }
 
     private void hourVisible(){
         HourView.getHourViewPager().setVisibility(View.VISIBLE);
+        dayInvisible();
         if(HourView.getHourProgressBar().getVisibility()!=View.GONE) {
             HourView.getHourProgressBar().setVisibility(View.VISIBLE);
         }
@@ -60,6 +56,21 @@ public class ListTab {
         HourView.getHourViewPager().setVisibility(View.INVISIBLE);
         if(HourView.getHourProgressBar().getVisibility()!=View.GONE) {
             HourView.getHourProgressBar().setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void dayVisible(){
+        DayView.getDayViewPager().setVisibility(View.VISIBLE);
+        hourInvisible();
+        if(DayView.getDayProgressBar().getVisibility()!=View.GONE) {
+            DayView.getDayProgressBar().setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void dayInvisible(){
+        DayView.getDayViewPager().setVisibility(View.INVISIBLE);
+        if(DayView.getDayProgressBar().getVisibility()!=View.GONE) {
+            DayView.getDayProgressBar().setVisibility(View.INVISIBLE);
         }
     }
 }

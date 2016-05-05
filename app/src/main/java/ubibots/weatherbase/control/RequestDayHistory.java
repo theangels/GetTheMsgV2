@@ -1,9 +1,7 @@
-/**
- * @Means 一步一步创建小时数据
- */
 package ubibots.weatherbase.control;
 
 import android.os.AsyncTask;
+import android.view.View;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -18,17 +16,20 @@ import java.util.regex.Pattern;
 
 import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanTabMessage;
-import ubibots.weatherbase.ui.HourView;
+import ubibots.weatherbase.ui.DayView;
 import ubibots.weatherbase.util.RequestUtil;
 
-public class RequestHourStep extends AsyncTask<String, Integer, String> {
-    public final static int MAX = 120;
-    private BeanTabMessage hour;
+
+public class RequestDayHistory extends AsyncTask<String, Integer, String> {
+    public final static int MAX = 48;
+    private BeanTabMessage day;
+    private int id;
     private String strURL;
     private int time;
 
-    public RequestHourStep(BeanTabMessage hour, int time) {
-        this.hour = hour;
+    public RequestDayHistory(BeanTabMessage day, int id, int time) {
+        this.day = day;
+        this.id = id;
         this.time = time;
     }
 
@@ -77,30 +78,34 @@ public class RequestHourStep extends AsyncTask<String, Integer, String> {
                 double humi = Double.valueOf(tmp.get(2));
 
                 //丢包重发
-                if (dateString.length() != 24 || temp < 0 || humi < 0) {
-                    reconnect(strURL, hour);
+                if (dateString.length() != 24 || temp <= 0 || humi <= 0) {
+                    reconnect(strURL, day, id);
                     return;
                 }
 
                 dateString = dateString.substring(0, 10) + " " + dateString.substring(11, 23);
-                Calendar calendar = RequestUtil.dateToCalender(dateString,"yyyy-MM-dd HH:mm:ss.SSS");
+                Calendar calendar = RequestUtil.dateToCalender(dateString, "yyyy-MM-dd HH:mm:ss.SSS");
                 calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + 8);
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+                SimpleDateFormat sdf = new SimpleDateFormat("dd HH:mm", Locale.getDefault());
                 dateString = sdf.format(calendar.getTime());
 
-                hour.getDate().remove(0);
-                hour.getDate().add(dateString);
-                hour.getTemperature().remove(0);
-                hour.getTemperature().add(temp);
-                hour.getHumidity().remove(0);
-                hour.getHumidity().add(humi);
+                day.getDate().set(id, dateString);
+                day.getTemperature().set(id, temp);
+                day.getHumidity().set(id, humi);
+                day.count++;
 
-                //刷新界面
-                RequestUtil.reflashLineView(HourView.getHourBeanLineView(), hour, "时:分:秒");
+                //历史数据收集完毕
+                if (day.count == MAX) {
+                    //刷新界面
+                    RequestUtil.reflashLineView(DayView.getDayBeanLineView(), day, "日 时:分");
 
-                System.out.println("Time: " + hour.getDate().get(MAX - 1) + " " + "Temperature: " + hour.getTemperature().get(MAX - 1) + " " + "Humidity: " + hour.getHumidity().get(MAX - 1) + " " + "Time: " + time);
+                    DayView.getRequestDayTimer().schedule(DayView.getRequestDayTask(), 0, BeanConstant.delayDay);
+                    DayView.getDayProgressBar().setVisibility(View.GONE);
+                }
+                DayView.getDayProgressBar().setProgress(100 * day.count / MAX);
+                System.out.println("Time: " + day.getDate().get(id) + " " + "Temperature: " + day.getTemperature().get(id) + " " + "Humidity: " + day.getHumidity().get(id) + " " + "Num: " + id + " " + "Count: " + day.count + " " + "Time: " + time);
             } else {//丢包重发
-                reconnect(strURL, hour);
+                reconnect(strURL, day, id);
             }
         } else {
             RequestUtil.connectFailed();
@@ -112,9 +117,8 @@ public class RequestHourStep extends AsyncTask<String, Integer, String> {
     protected void onPreExecute() {
     }
 
-
-    public void reconnect(String strURL, BeanTabMessage hour) {
-        RequestHourStep another = new RequestHourStep(hour, time + 1);
+    public void reconnect(String strURL, BeanTabMessage day, int id) {
+        RequestHourHistory another = new RequestHourHistory(day, id, time + 1);
         System.out.println("time: " + time);
         System.out.println(strURL);
         another.execute(strURL);

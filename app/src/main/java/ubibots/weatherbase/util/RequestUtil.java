@@ -6,6 +6,7 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -122,7 +123,7 @@ public class RequestUtil {
             } else {
                 temperatureValuesList.add(new PointValue(i, tmpTemperature));
             }
-            temperatureAxisValue.add(new AxisValue(i).setLabel(tab.getDate().get(i).substring(11,19)));
+            temperatureAxisValue.add(new AxisValue(i).setLabel(tab.getDate().get(i)));
         }
         temperatureLineList.add(temperatureLine);
 
@@ -225,7 +226,7 @@ public class RequestUtil {
             } else {
                 humidityValuesList.add(new PointValue(i, tmpHumidity));
             }
-            humidityAxisValue.add(new AxisValue(i).setLabel(tab.getDate().get(i).substring(11, 19)));
+            humidityAxisValue.add(new AxisValue(i).setLabel(tab.getDate().get(i)));
         }
         humidityLineList.add(humidityLine);
 
@@ -300,5 +301,17 @@ public class RequestUtil {
         strUrl = RequestUtil.addParameter(strUrl, params);
 
         return strUrl;
+    }
+
+    public static Calendar dateToCalender(String string, String format){
+        Calendar calendar = null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
+            calendar = Calendar.getInstance();
+            calendar.setTime(sdf.parse(string));
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return calendar;
     }
 }
