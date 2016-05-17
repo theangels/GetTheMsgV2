@@ -45,32 +45,40 @@ public class ListTab {
     }
 
     private void hourVisible(){
-        HourView.getHourViewPager().setVisibility(View.VISIBLE);
-        dayInvisible();
-        if(HourView.getHourProgressBar().getVisibility()!=View.GONE) {
-            HourView.getHourProgressBar().setVisibility(View.VISIBLE);
+        if(HourView.getHourViewPager()!=null) {
+            HourView.getHourViewPager().setVisibility(View.VISIBLE);
+            dayInvisible();
+            if (HourView.getHourProgressBar().getVisibility() != View.GONE) {
+                HourView.getHourProgressBar().setVisibility(View.VISIBLE);
+            }
         }
     }
 
     private void hourInvisible(){
-        HourView.getHourViewPager().setVisibility(View.INVISIBLE);
-        if(HourView.getHourProgressBar().getVisibility()!=View.GONE) {
-            HourView.getHourProgressBar().setVisibility(View.INVISIBLE);
+        if(HourView.getHourViewPager()!=null) {
+            HourView.getHourViewPager().setVisibility(View.INVISIBLE);
+            if (HourView.getHourProgressBar().getVisibility() != View.GONE) {
+                HourView.getHourProgressBar().setVisibility(View.INVISIBLE);
+            }
         }
     }
 
     private void dayVisible(){
-        DayView.getDayViewPager().setVisibility(View.VISIBLE);
-        hourInvisible();
-        if(DayView.getDayProgressBar().getVisibility()!=View.GONE) {
-            DayView.getDayProgressBar().setVisibility(View.VISIBLE);
+        if(DayView.getDayViewPager()!=null) {
+            DayView.getDayViewPager().setVisibility(View.VISIBLE);
+            hourInvisible();
+            if (DayView.getDayProgressBar().getVisibility() != View.GONE) {
+                DayView.getDayProgressBar().setVisibility(View.VISIBLE);
+            }
         }
     }
 
     private void dayInvisible(){
-        DayView.getDayViewPager().setVisibility(View.INVISIBLE);
-        if(DayView.getDayProgressBar().getVisibility()!=View.GONE) {
-            DayView.getDayProgressBar().setVisibility(View.INVISIBLE);
+        if(DayView.getDayViewPager()!=null) {
+            DayView.getDayViewPager().setVisibility(View.INVISIBLE);
+            if (DayView.getDayProgressBar().getVisibility() != View.GONE) {
+                DayView.getDayProgressBar().setVisibility(View.INVISIBLE);
+            }
         }
     }
 }

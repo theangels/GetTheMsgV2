@@ -2,8 +2,6 @@ package ubibots.weatherbase.ui;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Spannable;
@@ -14,13 +12,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import lecho.lib.hellocharts.gesture.ContainerScrollType;
 import lecho.lib.hellocharts.gesture.ZoomType;
@@ -36,11 +30,9 @@ import ubibots.weatherbase.model.BeanTabMessage;
 public class DayView {
     private static BeanLineView dayBeanLineView;
     private static BeanTabMessage day;
-    private static RequestDay requestDay;
     private static List<View> dayViewList;
     private static TextView[] dayDots;
     private static int dayCurrentIndex;
-    private static RequestDayHandler requestDayHandler;
     private static ViewPager dayViewPager;
     private static ProgressBar dayProgressBar;
 
@@ -54,6 +46,14 @@ public class DayView {
 
     public static ProgressBar getDayProgressBar() {
         return dayProgressBar;
+    }
+
+    public static BeanTabMessage getDay() {
+        return day;
+    }
+
+    public static void setDay(BeanTabMessage day) {
+        DayView.day = day;
     }
 
     private PagerAdapter dayPagerAdapter = new PagerAdapter() {
@@ -86,21 +86,6 @@ public class DayView {
 
     public DayView() {
         dayViewInit();
-
-        day = new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>());
-        requestDay = new RequestDay();
-        Calendar dayCalendar = Calendar.getInstance();
-        dayCalendar.set(Calendar.SECOND, dayCalendar.get(Calendar.SECOND) - BeanConstant.delayDay / 1000 * (RequestDayHistory.MAX - 1));
-        for (int i = 0; i < RequestDayHistory.MAX; i++) {
-            day.getTemperature().add(0.0);
-            day.getHumidity().add(0.0);
-            day.getDate().add("");
-            requestDay.dayHistory(day, dayCalendar, i);
-            dayCalendar.set(Calendar.SECOND, dayCalendar.get(Calendar.SECOND) + BeanConstant.delayDay / 1000);
-        }
-
-        Toast.makeText(MainActivity.context, "正在获取数据中,请耐心等待...",
-                Toast.LENGTH_LONG).show();
     }
 
     private void dayViewInit() {
@@ -121,8 +106,6 @@ public class DayView {
         dayViewList.add(view1);
         dayViewList.add(view2);
         dayBeanLineView = new BeanLineView(temperatureDayView, humidityDayView);
-
-        requestDayHandler = new RequestDayHandler();
 
         initDayDots();
         dayViewPager.setAdapter(dayPagerAdapter);
@@ -182,36 +165,6 @@ public class DayView {
             tv.append("温度");
         } else {
             tv.append("湿度");
-        }
-    }
-
-    private static Timer requestDayTimer = new Timer();
-    private static TimerTask requestDayTask = new TimerTask() {
-
-        @Override
-        public void run() {
-            // 需要做的事:发送消息
-            Message message = new Message();
-            message.what = 1;
-            requestDayHandler.sendMessage(message);
-        }
-    };
-
-    public static Timer getRequestDayTimer() {
-        return requestDayTimer;
-    }
-
-    public static TimerTask getRequestDayTask() {
-        return requestDayTask;
-    }
-
-    static class RequestDayHandler extends Handler {
-        public void handleMessage(Message msg) {
-            if (msg.what == 1) {
-                Calendar calendar = Calendar.getInstance();
-                requestDay.dayStep(day,calendar);
-            }
-            super.handleMessage(msg);
         }
     }
 }

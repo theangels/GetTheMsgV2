@@ -13,7 +13,6 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -104,8 +103,10 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
                     //刷新界面
                     RequestUtil.reflashLineView(HourView.getHourBeanLineView(), hour, "时:分:秒");
 
-                    HourView.getRequestHourTimer().schedule(HourView.getRequestHourTask(), 0, BeanConstant.delayHour);
+                    RequestHour.getRequestHourTimer().schedule(RequestHour.getRequestHourTask(), 0, BeanConstant.delayHour);
                     HourView.getHourProgressBar().setVisibility(View.GONE);
+
+                    new RequestDay().executeRequest();
                 }
                 HourView.getHourProgressBar().setProgress(100 * hour.count / MAX);
                 System.out.println("Time: " + hour.getDate().get(id) + " " + "Temperature: " + hour.getTemperature().get(id) + " " + "Humidity: " + hour.getHumidity().get(id) + " " + "Num: " + id + " " + "Count: " + hour.count + " " + "Time: " + time);

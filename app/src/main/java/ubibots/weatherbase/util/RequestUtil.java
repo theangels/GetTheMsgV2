@@ -132,8 +132,8 @@ public class RequestUtil {
         temperatureLine.setHasPoints(false);
         temperatureLine.setHasLines(false);
         float mm = maxTemperature - minTemperature;
-        temperatureValuesList.add(new PointValue(0, maxTemperature + mm));
-        temperatureValuesList.add(new PointValue(1, minTemperature - mm));
+        temperatureValuesList.add(new PointValue(0, maxTemperature + mm + 1));
+        temperatureValuesList.add(new PointValue(1, minTemperature - mm - 1));
         temperatureLineList.add(temperatureLine);
 
         LineChartData temperatureData = new LineChartData();

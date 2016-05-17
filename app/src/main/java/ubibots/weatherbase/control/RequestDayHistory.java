@@ -99,7 +99,7 @@ public class RequestDayHistory extends AsyncTask<String, Integer, String> {
                     //刷新界面
                     RequestUtil.reflashLineView(DayView.getDayBeanLineView(), day, "日 时:分");
 
-                    DayView.getRequestDayTimer().schedule(DayView.getRequestDayTask(), 0, BeanConstant.delayDay);
+                    RequestDay.getRequestDayTimer().schedule(RequestDay.getRequestDayTask(), 0, BeanConstant.delayDay);
                     DayView.getDayProgressBar().setVisibility(View.GONE);
                 }
                 DayView.getDayProgressBar().setProgress(100 * day.count / MAX);

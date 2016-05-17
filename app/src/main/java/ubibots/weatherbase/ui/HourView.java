@@ -2,8 +2,6 @@ package ubibots.weatherbase.ui;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Spannable;
@@ -14,22 +12,15 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import lecho.lib.hellocharts.gesture.ContainerScrollType;
 import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.view.LineChartView;
 import ubibots.weatherbase.MainActivity;
 import ubibots.weatherbase.R;
-import ubibots.weatherbase.control.RequestHour;
-import ubibots.weatherbase.control.RequestHourHistory;
-import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanLineView;
 import ubibots.weatherbase.model.BeanTabMessage;
 
@@ -37,11 +28,9 @@ import ubibots.weatherbase.model.BeanTabMessage;
 public class HourView {
     private static BeanLineView hourBeanLineView;
     private static BeanTabMessage hour;
-    private static RequestHour requestHour;
     private static List<View> hourViewList;
     private static TextView[] hourDots;
     private static int hourCurrentIndex;
-    private static RequestHourHandler requestHourHandler;
     private static ViewPager hourViewPager;
     private static ProgressBar hourProgressBar;
 
@@ -55,6 +44,14 @@ public class HourView {
 
     public static ProgressBar getHourProgressBar() {
         return hourProgressBar;
+    }
+
+    public static BeanTabMessage getHour() {
+        return hour;
+    }
+
+    public static void setHour(BeanTabMessage hour) {
+        HourView.hour = hour;
     }
 
     private PagerAdapter hourPagerAdapter = new PagerAdapter() {
@@ -87,21 +84,6 @@ public class HourView {
 
     public HourView() {
         hourViewInit();
-
-        hour = new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>());
-        requestHour = new RequestHour();
-        Calendar hourCalendar = Calendar.getInstance();
-        hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) - BeanConstant.delayHour / 1000 * (RequestHourHistory.MAX - 1));
-        for (int i = 0; i < RequestHourHistory.MAX; i++) {
-            hour.getTemperature().add(0.0);
-            hour.getHumidity().add(0.0);
-            hour.getDate().add("");
-            requestHour.hourHistory(hour, hourCalendar, i);
-            hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) + BeanConstant.delayHour / 1000);
-        }
-
-        Toast.makeText(MainActivity.context, "正在获取数据中,请耐心等待...",
-                Toast.LENGTH_LONG).show();
     }
 
     private void hourViewInit() {
@@ -122,8 +104,6 @@ public class HourView {
         hourViewList.add(view1);
         hourViewList.add(view2);
         hourBeanLineView = new BeanLineView(temperatureHourView, humidityHourView);
-
-        requestHourHandler = new RequestHourHandler();
 
         initHourDots();
         hourViewPager.setAdapter(hourPagerAdapter);
@@ -186,33 +166,4 @@ public class HourView {
         }
     }
 
-    private static Timer requestHourTimer = new Timer();
-    private static TimerTask requestHourTask = new TimerTask() {
-
-        @Override
-        public void run() {
-            // 需要做的事:发送消息
-            Message message = new Message();
-            message.what = 1;
-            requestHourHandler.sendMessage(message);
-        }
-    };
-
-    public static Timer getRequestHourTimer() {
-        return requestHourTimer;
-    }
-
-    public static TimerTask getRequestHourTask() {
-        return requestHourTask;
-    }
-
-    static class RequestHourHandler extends Handler{
-        public void handleMessage(Message msg) {
-            if (msg.what == 1) {
-                Calendar calendar = Calendar.getInstance();
-                requestHour.hourStep(hour,calendar);
-            }
-            super.handleMessage(msg);
-        }
-    }
 }
