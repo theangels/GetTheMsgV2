@@ -13,9 +13,11 @@ import ubibots.weatherbase.MainActivity;
 import ubibots.weatherbase.R;
 
 public class ListTab {
+    private int currentTab;
+    private ListView listView;
 
     public ListTab(){
-        ListView listView = (ListView) MainActivity.activity.findViewById(R.id.listview);
+        listView = (ListView) MainActivity.activity.findViewById(R.id.listview);
         listView.setBackgroundColor(Color.GRAY);
         listView.setCacheColorHint(0);
         final List<String> data = new ArrayList<>();
@@ -31,17 +33,21 @@ public class ListTab {
                 switch (click) {
                     case "每时":
                         hourVisible();
+                        currentTab = 0;
                         break;
                     case "每日":
                         dayVisible();
+                        currentTab = 1;
                         break;
                     case "每周":
                         hourInvisible();
+                        currentTab = 2;
                         break;
                 }
             }
         });
         hourVisible();
+        currentTab = 0;
     }
 
     private void hourVisible(){
@@ -80,5 +86,13 @@ public class ListTab {
                 DayView.getDayProgressBar().setVisibility(View.INVISIBLE);
             }
         }
+    }
+
+    public int getCurrentTab(){
+        return currentTab;
+    }
+
+    public ListView getListView(){
+        return listView;
     }
 }
