@@ -19,13 +19,13 @@ import java.util.List;
 import lecho.lib.hellocharts.gesture.ContainerScrollType;
 import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.view.LineChartView;
-import ubibots.weatherbase.MainActivity;
 import ubibots.weatherbase.R;
+import ubibots.weatherbase.DisplayHistoryActivity;
 import ubibots.weatherbase.model.BeanLineView;
 import ubibots.weatherbase.model.BeanTabMessage;
 
-
 public class HourView {
+
     private static BeanLineView hourBeanLineView;
     private static BeanTabMessage hour;
     private static List<View> hourViewList;
@@ -54,58 +54,60 @@ public class HourView {
         HourView.hour = hour;
     }
 
-    private PagerAdapter hourPagerAdapter = new PagerAdapter() {
-        //ÂÆòÊñπÂª∫ËÆÆËøô‰πàÂÜô
-        @Override
-        public boolean isViewFromObject(View arg0, Object arg1) {
-            return arg0 == arg1;
-        }
-
-        //ËøîÂõû‰∏ÄÂÖ±ÊúâÂ§öÂ∞ë‰∏™ÁïåÈù¢
-        @Override
-        public int getCount() {
-            return hourViewList.size();
-        }
-
-        //ÂÆû‰æãÂåñ‰∏Ä‰∏™item
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            container.addView(hourViewList.get(position));
-            return hourViewList.get(position);
-        }
-
-        //ÈîÄÊØÅ‰∏Ä‰∏™item
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView(hourViewList.get(position));
-        }
-
-    };
-
     public HourView() {
-        hourViewInit();
-    }
-
-    private void hourViewInit() {
-        hourViewPager = (ViewPager) MainActivity.activity.findViewById(R.id.hourView);
+        hourViewPager = (ViewPager) DisplayHistoryActivity.getActivity().findViewById(R.id.hourView);
         hourViewList = new ArrayList<>();
-        View view1 = View.inflate(MainActivity.context, R.layout.temperaturehour, null);
+        View view1 = View.inflate(DisplayHistoryActivity.getContext(), R.layout.temperaturehour, null);
         LineChartView temperatureHourView = (LineChartView) view1.findViewById(R.id.temperaturehour);
         temperatureHourView.setInteractive(false);
         temperatureHourView.setZoomType(ZoomType.HORIZONTAL);
         temperatureHourView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
         temperatureHourView.setVisibility(View.VISIBLE);
-        View view2 = View.inflate(MainActivity.context, R.layout.humidityhour, null);
+        View view2 = View.inflate(DisplayHistoryActivity.getContext(), R.layout.humidityhour, null);
         LineChartView humidityHourView = (LineChartView) view2.findViewById(R.id.humidityhour);
         humidityHourView.setInteractive(false);
         humidityHourView.setZoomType(ZoomType.HORIZONTAL);
         humidityHourView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
         humidityHourView.setVisibility(View.VISIBLE);
+        View view3 = View.inflate(DisplayHistoryActivity.getContext(), R.layout.airhour, null);
+        LineChartView airHourView = (LineChartView) view3.findViewById(R.id.airhour);
+        airHourView.setInteractive(false);
+        airHourView.setZoomType(ZoomType.HORIZONTAL);
+        airHourView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
+        airHourView.setVisibility(View.VISIBLE);
         hourViewList.add(view1);
         hourViewList.add(view2);
-        hourBeanLineView = new BeanLineView(temperatureHourView, humidityHourView);
+        hourViewList.add(view3);
+        hourBeanLineView = new BeanLineView(temperatureHourView, humidityHourView, airHourView);
 
         initHourDots();
+        PagerAdapter hourPagerAdapter = new PagerAdapter() {
+            //πŸ∑ΩΩ®“È’‚√¥–¥
+            @Override
+            public boolean isViewFromObject(View arg0, Object arg1) {
+                return arg0 == arg1;
+            }
+
+            //∑µªÿ“ªπ≤”–∂‡…Ÿ∏ˆΩÁ√Ê
+            @Override
+            public int getCount() {
+                return hourViewList.size();
+            }
+
+            // µ¿˝ªØ“ª∏ˆitem
+            @Override
+            public Object instantiateItem(ViewGroup container, int position) {
+                container.addView(hourViewList.get(position));
+                return hourViewList.get(position);
+            }
+
+            //œ˙ªŸ“ª∏ˆitem
+            @Override
+            public void destroyItem(ViewGroup container, int position, Object object) {
+                container.removeView(hourViewList.get(position));
+            }
+
+        };
         hourViewPager.setAdapter(hourPagerAdapter);
         hourViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -122,14 +124,14 @@ public class HourView {
             }
         });
 
-        hourProgressBar = (ProgressBar)MainActivity.activity.findViewById(R.id.hourProgressBar);
+        hourProgressBar = (ProgressBar)DisplayHistoryActivity.getActivity().findViewById(R.id.hourProgressBar);
     }
 
     /**
-     * ÂàùÂßãÂåñÂ∫ïÈÉ®ÁöÑÁÇπ
+     * ≥ı ºªØµ◊≤øµƒµ„
      */
     private void initHourDots() {
-        LinearLayout hourPointLayout = (LinearLayout) MainActivity.activity.findViewById(R.id.point_layout1);
+        LinearLayout hourPointLayout = (LinearLayout) DisplayHistoryActivity.getActivity().findViewById(R.id.point);
         hourDots = new TextView[hourViewList.size()];
         for (int i = 0; i < hourViewList.size(); i++) {
             hourDots[i] = (TextView) hourPointLayout.getChildAt(i);
@@ -141,7 +143,7 @@ public class HourView {
 
 
     /**
-     * ÂΩìÊªöÂä®ÁöÑÊó∂ÂÄôÊõ¥Êç¢ÁÇπÁöÑËÉåÊôØÂõæ
+     * µ±πˆ∂Øµƒ ±∫Ú∏¸ªªµ„µƒ±≥æ∞Õº
      */
     private void setHourDots(int position) {
         if (position < 0 || position > hourViewList.size() - 1
@@ -154,15 +156,17 @@ public class HourView {
     }
 
     private void setTextDrawable(TextView tv, int id, int index) {
-        Bitmap b = BitmapFactory.decodeResource(MainActivity.activity.getResources(), id);
-        ImageSpan imgSpan = new ImageSpan(MainActivity.context, b);
+        Bitmap b = BitmapFactory.decodeResource(DisplayHistoryActivity.getActivity().getResources(), id);
+        ImageSpan imgSpan = new ImageSpan(DisplayHistoryActivity.getContext(), b);
         SpannableString spanString = new SpannableString("icon");
         spanString.setSpan(imgSpan, 0, 4, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         tv.setText(spanString);
         if (index == 0) {
-            tv.append("Ê∏©Â∫¶");
-        } else {
-            tv.append("ÊπøÂ∫¶");
+            tv.append("Œ¬∂»");
+        } else if(index == 1){
+            tv.append(" ™∂»");
+        }else if(index == 2){
+            tv.append("PM2.5");
         }
     }
 

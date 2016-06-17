@@ -19,15 +19,13 @@ import java.util.List;
 import lecho.lib.hellocharts.gesture.ContainerScrollType;
 import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.view.LineChartView;
-import ubibots.weatherbase.MainActivity;
 import ubibots.weatherbase.R;
-import ubibots.weatherbase.control.RequestDay;
-import ubibots.weatherbase.control.RequestDayHistory;
-import ubibots.weatherbase.model.BeanConstant;
+import ubibots.weatherbase.DisplayHistoryActivity;
 import ubibots.weatherbase.model.BeanLineView;
 import ubibots.weatherbase.model.BeanTabMessage;
 
 public class DayView {
+
     private static BeanLineView dayBeanLineView;
     private static BeanTabMessage day;
     private static List<View> dayViewList;
@@ -56,58 +54,60 @@ public class DayView {
         DayView.day = day;
     }
 
-    private PagerAdapter dayPagerAdapter = new PagerAdapter() {
-        //ÂÆòÊñπÂª∫ËÆÆËøô‰πàÂÜô
-        @Override
-        public boolean isViewFromObject(View arg0, Object arg1) {
-            return arg0 == arg1;
-        }
-
-        //ËøîÂõû‰∏ÄÂÖ±ÊúâÂ§öÂ∞ë‰∏™ÁïåÈù¢
-        @Override
-        public int getCount() {
-            return dayViewList.size();
-        }
-
-        //ÂÆû‰æãÂåñ‰∏Ä‰∏™item
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            container.addView(dayViewList.get(position));
-            return dayViewList.get(position);
-        }
-
-        //ÈîÄÊØÅ‰∏Ä‰∏™item
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView(dayViewList.get(position));
-        }
-
-    };
-
     public DayView() {
-        dayViewInit();
-    }
-
-    private void dayViewInit() {
-        dayViewPager = (ViewPager) MainActivity.activity.findViewById(R.id.dayView);
+        dayViewPager = (ViewPager) DisplayHistoryActivity.getActivity().findViewById(R.id.dayView);
         dayViewList = new ArrayList<>();
-        View view1 = View.inflate(MainActivity.context, R.layout.temperatureday, null);
+        View view1 = View.inflate(DisplayHistoryActivity.getContext(), R.layout.temperatureday, null);
         LineChartView temperatureDayView = (LineChartView) view1.findViewById(R.id.temperatureday);
         temperatureDayView.setInteractive(false);
         temperatureDayView.setZoomType(ZoomType.HORIZONTAL);
         temperatureDayView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
         temperatureDayView.setVisibility(View.VISIBLE);
-        View view2 = View.inflate(MainActivity.context, R.layout.humidityday, null);
+        View view2 = View.inflate(DisplayHistoryActivity.getContext(), R.layout.humidityday, null);
         LineChartView humidityDayView = (LineChartView) view2.findViewById(R.id.humidityday);
         humidityDayView.setInteractive(false);
         humidityDayView.setZoomType(ZoomType.HORIZONTAL);
         humidityDayView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
         humidityDayView.setVisibility(View.VISIBLE);
+        View view3 = View.inflate(DisplayHistoryActivity.getContext(), R.layout.airday, null);
+        LineChartView airDayView = (LineChartView) view3.findViewById(R.id.airday);
+        airDayView.setInteractive(false);
+        airDayView.setZoomType(ZoomType.HORIZONTAL);
+        airDayView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
+        airDayView.setVisibility(View.VISIBLE);
         dayViewList.add(view1);
         dayViewList.add(view2);
-        dayBeanLineView = new BeanLineView(temperatureDayView, humidityDayView);
+        dayViewList.add(view3);
+        dayBeanLineView = new BeanLineView(temperatureDayView, humidityDayView, airDayView);
 
         initDayDots();
+        PagerAdapter dayPagerAdapter = new PagerAdapter() {
+            //πŸ∑ΩΩ®“È’‚√¥–¥
+            @Override
+            public boolean isViewFromObject(View arg0, Object arg1) {
+                return arg0 == arg1;
+            }
+
+            //∑µªÿ“ªπ≤”–∂‡…Ÿ∏ˆΩÁ√Ê
+            @Override
+            public int getCount() {
+                return dayViewList.size();
+            }
+
+            // µ¿˝ªØ“ª∏ˆitem
+            @Override
+            public Object instantiateItem(ViewGroup container, int position) {
+                container.addView(dayViewList.get(position));
+                return dayViewList.get(position);
+            }
+
+            //œ˙ªŸ“ª∏ˆitem
+            @Override
+            public void destroyItem(ViewGroup container, int position, Object object) {
+                container.removeView(dayViewList.get(position));
+            }
+
+        };
         dayViewPager.setAdapter(dayPagerAdapter);
         dayViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -124,14 +124,14 @@ public class DayView {
             }
         });
 
-        dayProgressBar = (ProgressBar)MainActivity.activity.findViewById(R.id.dayProgressBar);
+        dayProgressBar = (ProgressBar)DisplayHistoryActivity.getActivity().findViewById(R.id.dayProgressBar);
     }
 
     /**
-     * ÂàùÂßãÂåñÂ∫ïÈÉ®ÁöÑÁÇπ
+     * ≥ı ºªØµ◊≤øµƒµ„
      */
     private void initDayDots() {
-        LinearLayout dayPointLayout = (LinearLayout) MainActivity.activity.findViewById(R.id.point_layout1);
+        LinearLayout dayPointLayout = (LinearLayout) DisplayHistoryActivity.getActivity().findViewById(R.id.point);
         dayDots = new TextView[dayViewList.size()];
         for (int i = 0; i < dayViewList.size(); i++) {
             dayDots[i] = (TextView) dayPointLayout.getChildAt(i);
@@ -143,7 +143,7 @@ public class DayView {
 
 
     /**
-     * ÂΩìÊªöÂä®ÁöÑÊó∂ÂÄôÊõ¥Êç¢ÁÇπÁöÑËÉåÊôØÂõæ
+     * µ±πˆ∂Øµƒ ±∫Ú∏¸ªªµ„µƒ±≥æ∞Õº
      */
     private void setDayDots(int position) {
         if (position < 0 || position > dayViewList.size() - 1
@@ -156,15 +156,17 @@ public class DayView {
     }
 
     private void setTextDrawable(TextView tv, int id, int index) {
-        Bitmap b = BitmapFactory.decodeResource(MainActivity.activity.getResources(), id);
-        ImageSpan imgSpan = new ImageSpan(MainActivity.context, b);
+        Bitmap b = BitmapFactory.decodeResource(DisplayHistoryActivity.getActivity().getResources(), id);
+        ImageSpan imgSpan = new ImageSpan(DisplayHistoryActivity.getContext(), b);
         SpannableString spanString = new SpannableString("icon");
         spanString.setSpan(imgSpan, 0, 4, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         tv.setText(spanString);
         if (index == 0) {
-            tv.append("Ê∏©Â∫¶");
-        } else {
-            tv.append("ÊπøÂ∫¶");
+            tv.append("Œ¬∂»");
+        } else if(index == 1){
+            tv.append(" ™∂»");
+        }else if(index == 2){
+            tv.append("PM2.5");
         }
     }
 }

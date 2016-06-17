@@ -1,6 +1,3 @@
-/**
- * @Means ä¸€æ¬¡æ€§è·å–å†å²æ•°æ®
- */
 package ubibots.weatherbase.control;
 
 import android.os.AsyncTask;
@@ -23,6 +20,7 @@ import ubibots.weatherbase.ui.HourView;
 import ubibots.weatherbase.util.RequestUtil;
 
 public class RequestHourHistory extends AsyncTask<String, Integer, String> {
+
     public final static int MAX = 120;
     private BeanTabMessage hour;
     private int id;
@@ -35,7 +33,7 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
         this.time = time;
     }
 
-    //è¯¥æ–¹æ³•å¹¶ä¸è¿è¡Œåœ¨UIçº¿ç¨‹å½“ä¸­ï¼Œä¸»è¦ç”¨äºå¼‚æ­¥æ“ä½œï¼Œæ‰€æœ‰åœ¨è¯¥æ–¹æ³•ä¸­ä¸èƒ½å¯¹UIå½“ä¸­çš„ç©ºé—´è¿›è¡Œè®¾ç½®å’Œä¿®æ”¹
+    //¸Ã·½·¨²¢²»ÔËĞĞÔÚUIÏß³Ìµ±ÖĞ£¬Ö÷ÒªÓÃÓÚÒì²½²Ù×÷£¬ËùÓĞÔÚ¸Ã·½·¨ÖĞ²»ÄÜ¶ÔUIµ±ÖĞµÄ¿Õ¼ä½øĞĞÉèÖÃºÍĞŞ¸Ä
     @Override
     protected String doInBackground(String... params) {
         //System.out.println("Url: " + params[0]);
@@ -44,10 +42,10 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
             url = new URL(params[0]);
             strURL = params[0];
             HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
-            urlConn.setDoInput(true); //å…è®¸è¾“å…¥æµï¼Œå³å…è®¸ä¸‹è½½
-            urlConn.setDoOutput(true); //å…è®¸è¾“å‡ºæµï¼Œå³å…è®¸ä¸Šä¼ 
-            urlConn.setUseCaches(false); //ä¸ä½¿ç”¨ç¼“å†²
-            urlConn.setRequestMethod("POST"); //ä½¿ç”¨getè¯·æ±‚
+            urlConn.setDoInput(true); //ÔÊĞíÊäÈëÁ÷£¬¼´ÔÊĞíÏÂÔØ
+            urlConn.setDoOutput(true); //ÔÊĞíÊä³öÁ÷£¬¼´ÔÊĞíÉÏ´«
+            urlConn.setUseCaches(false); //²»Ê¹ÓÃ»º³å
+            urlConn.setRequestMethod("POST"); //Ê¹ÓÃgetÇëÇó
             InputStreamReader in = new InputStreamReader(urlConn.getInputStream());
             BufferedReader bufferedReader = new BufferedReader(in);
             String result = "";
@@ -64,10 +62,10 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
         return null;
     }
 
-    //åœ¨doInBackgroundæ–¹æ³•æ‰§è¡Œç»“æŸä¹‹ååœ¨è¿è¡Œï¼Œå¹¶ä¸”è¿è¡Œåœ¨UIçº¿ç¨‹å½“ä¸­ å¯ä»¥å¯¹UIç©ºé—´è¿›è¡Œè®¾ç½®
+    //ÔÚdoInBackground·½·¨Ö´ĞĞ½áÊøÖ®ºóÔÚÔËĞĞ£¬²¢ÇÒÔËĞĞÔÚUIÏß³Ìµ±ÖĞ ¿ÉÒÔ¶ÔUI¿Õ¼ä½øĞĞÉèÖÃ
     @Override
     protected void onPostExecute(String result) {
-        if (result != null && time < BeanConstant.MAXTIME) {
+        if (result != null) {
             Pattern pattern = Pattern.compile("<TD>(.*?)</TD>");
             Matcher matcher = pattern.matcher(result);
 
@@ -76,19 +74,32 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
                 tmp.add(matcher.group(1));
             }
 
-            if (tmp.size() >= 3) {
+            if (tmp.size() >= 4) {
                 String dateString = tmp.get(0);
-                double temp = Double.valueOf(tmp.get(1));
-                double humi = Double.valueOf(tmp.get(2));
+                double temp = 0;
+                String tempString = tmp.get(1);
+                if (!tempString.equals("---")) {
+                    temp = Double.valueOf(tempString);
+                }
+                String humiString = tmp.get(2);
+                double humi = 0;
+                if(!humiString.equals("---")){
+                    humi = Double.valueOf(humiString);
+                }
+                String airString = tmp.get(3);
+                double air = 0;
+                if(!airString.equals("---")){
+                    air = Double.valueOf(airString);
+                }
 
-                //ä¸¢åŒ…é‡å‘
-                if (dateString.length() != 24 || temp < 0 || humi < 0) {
+                //¶ª°üÖØ·¢
+                if (dateString.length() != 24 || temp < 0 || humi < 0 || air < 0) {
                     reconnect(strURL, hour, id);
                     return;
                 }
 
                 dateString = dateString.substring(0, 10) + " " + dateString.substring(11, 23);
-                Calendar calendar = RequestUtil.dateToCalender(dateString,"yyyy-MM-dd HH:mm:ss.SSS");
+                Calendar calendar = RequestUtil.dateToCalender(dateString, "yyyy-MM-dd HH:mm:ss.SSS");
                 calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + 8);
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
                 dateString = sdf.format(calendar.getTime());
@@ -96,21 +107,22 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
                 hour.getDate().set(id, dateString);
                 hour.getTemperature().set(id, temp);
                 hour.getHumidity().set(id, humi);
+                hour.getAir().set(id, air);
                 hour.count++;
 
-                //å†å²æ•°æ®æ”¶é›†å®Œæ¯•
+                //ÀúÊ·Êı¾İÊÕ¼¯Íê±Ï
                 if (hour.count == MAX) {
-                    //åˆ·æ–°ç•Œé¢
-                    RequestUtil.reflashLineView(HourView.getHourBeanLineView(), hour, "æ—¶:åˆ†:ç§’");
+                    //Ë¢ĞÂ½çÃæ
+                    RequestUtil.reflashLineView(HourView.getHourBeanLineView(), hour, "Ê±:·Ö:Ãë");
 
-                    RequestHour.getRequestHourTimer().schedule(RequestHour.getRequestHourTask(), 0, BeanConstant.delayHour);
+                    RequestHour.getRequestHourTimer().schedule(RequestHour.getRequestHourTask(), BeanConstant.delayHour, BeanConstant.delayHour);
                     HourView.getHourProgressBar().setVisibility(View.GONE);
 
                     new RequestDay().executeRequest();
                 }
                 HourView.getHourProgressBar().setProgress(100 * hour.count / MAX);
                 System.out.println("Time: " + hour.getDate().get(id) + " " + "Temperature: " + hour.getTemperature().get(id) + " " + "Humidity: " + hour.getHumidity().get(id) + " " + "Num: " + id + " " + "Count: " + hour.count + " " + "Time: " + time);
-            } else {//ä¸¢åŒ…é‡å‘
+            } else {//¶ª°üÖØ·¢
                 reconnect(strURL, hour, id);
             }
         } else {
@@ -118,15 +130,18 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
         }
     }
 
-    //è¯¥æ–¹æ³•è¿è¡Œåœ¨UIçº¿ç¨‹å½“ä¸­,å¹¶ä¸”è¿è¡Œåœ¨UIçº¿ç¨‹å½“ä¸­ å¯ä»¥å¯¹UIç©ºé—´è¿›è¡Œè®¾ç½®
+    //¸Ã·½·¨ÔËĞĞÔÚUIÏß³Ìµ±ÖĞ,²¢ÇÒÔËĞĞÔÚUIÏß³Ìµ±ÖĞ ¿ÉÒÔ¶ÔUI¿Õ¼ä½øĞĞÉèÖÃ
     @Override
     protected void onPreExecute() {
     }
 
     public void reconnect(String strURL, BeanTabMessage hour, int id) {
-        RequestHourHistory another = new RequestHourHistory(hour, id, time + 1);
-        System.out.println("time: " + time);
-        System.out.println(strURL);
-        another.execute(strURL);
+        int time = this.time + 1;
+        if (time <= BeanConstant.MAXTIME) {
+            RequestHourHistory another = new RequestHourHistory(hour, id, time + 1);
+            System.out.println("time: " + time);
+            System.out.println(strURL);
+            another.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, strURL);
+        }
     }
 }

@@ -6,7 +6,6 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -17,27 +16,12 @@ import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Line;
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.PointValue;
-import ubibots.weatherbase.MainActivity;
+import ubibots.weatherbase.DisplayHistoryActivity;
 import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanLineView;
 import ubibots.weatherbase.model.BeanTabMessage;
 
 public class RequestUtil {
-    public static String addParameter(String path, Map<String, String> params) {
-        String URL = path;
-        if (params != null && URL.length() != 0) {
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                try {
-                    URL += entry.getKey() + "=" + entry.getValue();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                URL += "&";
-            }
-            URL = URL.substring(0, URL.length() - 1);
-        }
-        return URL;
-    }
 
     public static String UTCDateFormat(Calendar calendar) {
         String UTCDate;
@@ -54,7 +38,7 @@ public class RequestUtil {
     }
 
     public static void connectFailed() {
-        Toast.makeText(MainActivity.context, "ËøûÊé•Â§±Ë¥•ÔºåËØ∑Ê£ÄÊü•ÁΩëÁªúÁéØÂ¢ÉÂπ∂ÈáçÂêØÊú¨Á®ãÂ∫è...",
+        Toast.makeText(DisplayHistoryActivity.getContext(), "¡¨Ω” ß∞‹£¨«ÎºÏ≤ÈÕ¯¬Áª∑æ≥≤¢÷ÿ∆Ù±æ≥Ã–Ú...",
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -139,8 +123,8 @@ public class RequestUtil {
         LineChartData temperatureData = new LineChartData();
         temperatureData.setLines(temperatureLineList);
 
-        //ÂùêÊ†áËΩ¥
-        Axis axisX = new Axis();//XËΩ¥
+        //◊¯±Í÷·
+        Axis axisX = new Axis();//X÷·
         axisX.setHasLines(true);
         axisX.setHasTiltedLabels(true);
         axisX.setTextColor(Color.WHITE);
@@ -149,17 +133,17 @@ public class RequestUtil {
         axisX.setValues(temperatureAxisValue);
         temperatureData.setAxisXBottom(axisX);
 
-        Axis axisY1 = new Axis();//Y1ËΩ¥
+        Axis axisY1 = new Axis();//Y1÷·
         axisY1.setHasLines(true);
         axisY1.setTextColor(Color.WHITE);
-        axisY1.setName("ÊëÑÊ∞èÂ∫¶/‚ÑÉ");
+        axisY1.setName("…„ œ∂»/°Ê");
         axisY1.setMaxLabelChars(4);
         temperatureData.setAxisYLeft(axisY1);
 
-        Axis axisY2 = new Axis();//Y2ËΩ¥
+        Axis axisY2 = new Axis();//Y2÷·
         axisY2.setHasLines(true);
         axisY2.setTextColor(Color.WHITE);
-        axisY2.setName("ÊëÑÊ∞èÂ∫¶/‚ÑÉ");
+        axisY2.setName("…„ œ∂»/°Ê");
         axisY2.setMaxLabelChars(4);
         temperatureData.setAxisYRight(axisY2);
         lineView.getTemperatureView().setLineChartData(temperatureData);
@@ -235,15 +219,15 @@ public class RequestUtil {
         humidityLine.setHasPoints(false);
         humidityLine.setHasLines(false);
         mm = maxHumidity - minHumidity;
-        humidityValuesList.add(new PointValue(0, maxHumidity + mm));
-        humidityValuesList.add(new PointValue(1, minHumidity - mm));
+        humidityValuesList.add(new PointValue(0, maxHumidity + mm + 1));
+        humidityValuesList.add(new PointValue(1, minHumidity - mm - 1));
         humidityLineList.add(humidityLine);
 
         LineChartData humidityData = new LineChartData();
         humidityData.setLines(humidityLineList);
 
-        //ÂùêÊ†áËΩ¥
-        axisX = new Axis();//XËΩ¥
+        //◊¯±Í÷·
+        axisX = new Axis();//X÷·
         axisX.setHasLines(true);
         axisX.setHasTiltedLabels(true);
         axisX.setTextColor(Color.WHITE);
@@ -252,26 +236,124 @@ public class RequestUtil {
         axisX.setValues(humidityAxisValue);
         humidityData.setAxisXBottom(axisX);
 
-        axisY1 = new Axis();//Y1ËΩ¥
+        axisY1 = new Axis();//Y1÷·
         axisY1.setHasLines(true);
         axisY1.setTextColor(Color.WHITE);
-        axisY1.setName("ÊëÑÊ∞èÂ∫¶/‚ÑÉ");
+        axisY1.setName(" ™∂»/%RH");
         axisY1.setMaxLabelChars(4);
         humidityData.setAxisYLeft(axisY1);
 
-        axisY2 = new Axis();//Y2ËΩ¥
+        axisY2 = new Axis();//Y2÷·0
         axisY2.setHasLines(true);
         axisY2.setTextColor(Color.WHITE);
-        axisY2.setName("ÊëÑÊ∞èÂ∫¶/‚ÑÉ");
+        axisY2.setName(" ™∂»/%RH");
         axisY2.setMaxLabelChars(4);
         humidityData.setAxisYRight(axisY2);
         lineView.getHumidityView().setLineChartData(humidityData);
+
+        List<Line> airLineList = new ArrayList<>();
+        List<PointValue> airValuesList;
+        Line airLine = null;
+        List<AxisValue> airAxisValue = new ArrayList<>();
+        state = -1;
+        airValuesList = new ArrayList<>();
+        float maxAir = -2333;
+        float minAir = 2333;
+        for (int i = 0; i < tab.getAir().size(); i++) {
+            float tmpAir = tab.getAir().get(i).floatValue();
+            maxAir = Math.max(tmpAir, maxAir);
+            minAir = Math.min(tmpAir, minAir);
+            if (tmpAir < BeanConstant.DOWNAIR && state != LOWLINE) {
+                float tmp = -1;
+                if (airLine != null) {
+                    airLineList.add(airLine);
+                    tmp = tab.getAir().get(i - 1).floatValue();
+                }
+                airValuesList = new ArrayList<>();
+                airLine = new Line(airValuesList).setColor(Color.GREEN).setCubic(false);
+                airLine.setHasPoints(false);
+                if (tmp != -1) {
+                    airValuesList.add(new PointValue(i - 1, tmp));
+                }
+                airValuesList.add(new PointValue(i, tmpAir));
+                state = LOWLINE;
+            } else if (tmpAir >= BeanConstant.DOWNAIR && tmpAir <= BeanConstant.UPAIR && state != MIDLINE) {
+                float tmp = -1;
+                if (airLine != null) {
+                    airLineList.add(airLine);
+                    tmp = tab.getAir().get(i - 1).floatValue();
+                }
+                airValuesList = new ArrayList<>();
+                airLine = new Line(airValuesList).setColor(Color.BLUE).setCubic(false);
+                airLine.setHasPoints(false);
+                if (tmp != -1) {
+                    airValuesList.add(new PointValue(i - 1, tmp));
+                }
+                airValuesList.add(new PointValue(i, tmpAir));
+                state = MIDLINE;
+            } else if (tmpAir > BeanConstant.UPAIR && state != UPLINE) {
+                float tmp = -1;
+                if (airLine != null) {
+                    airLineList.add(airLine);
+                    tmp = tab.getAir().get(i - 1).floatValue();
+                }
+                airValuesList = new ArrayList<>();
+                airLine = new Line(airValuesList).setColor(Color.RED).setCubic(false);
+                airLine.setHasPoints(false);
+                if (tmp != -1) {
+                    airValuesList.add(new PointValue(i - 1, tmp));
+                }
+                airValuesList.add(new PointValue(i, tmpAir));
+                state = UPLINE;
+            } else {
+                airValuesList.add(new PointValue(i, tmpAir));
+            }
+            airAxisValue.add(new AxisValue(i).setLabel(tab.getDate().get(i)));
+        }
+        airLineList.add(airLine);
+
+        airValuesList = new ArrayList<>();
+        airLine = new Line(airValuesList).setColor(Color.BLACK).setCubic(false);
+        airLine.setHasPoints(false);
+        airLine.setHasLines(false);
+        mm = maxAir - minAir;
+        airValuesList.add(new PointValue(0, maxAir + mm + 1));
+        airValuesList.add(new PointValue(1, minAir - mm - 1));
+        airLineList.add(airLine);
+
+        LineChartData airData = new LineChartData();
+        airData.setLines(airLineList);
+
+        //◊¯±Í÷·
+        axisX = new Axis();//X÷·
+        axisX.setHasLines(true);
+        axisX.setHasTiltedLabels(true);
+        axisX.setTextColor(Color.WHITE);
+        axisX.setName(xName);
+        axisX.setMaxLabelChars(6);
+        axisX.setValues(airAxisValue);
+        airData.setAxisXBottom(axisX);
+
+        axisY1 = new Axis();//Y1÷·
+        axisY1.setHasLines(true);
+        axisY1.setTextColor(Color.WHITE);
+        axisY1.setName("PM2.5/ug/m3");
+        axisY1.setMaxLabelChars(4);
+        airData.setAxisYLeft(axisY1);
+
+        axisY2 = new Axis();//Y2÷·0
+        axisY2.setHasLines(true);
+        axisY2.setTextColor(Color.WHITE);
+        axisY2.setName("PM2.5/ug/m3");
+        axisY2.setMaxLabelChars(4);
+        airData.setAxisYRight(axisY2);
+        lineView.getAirView().setLineChartData(airData);
     }
 
     public static String combineUrl(Calendar calendar) {
         String ipAddress = "zucc.cloud.thingworx.com:80";
-        String appKey = "deaf648e-e691-4e9e-88a9-1a80b21145c3";
-        String things = "DHT21Thing";
+        String appKey = "9653e971-e905-472e-acae-57bab94e8057";
+        String things = "WeatherBase";
         String service;
         String strUrl;
         String startDate;
@@ -301,6 +383,22 @@ public class RequestUtil {
         strUrl = RequestUtil.addParameter(strUrl, params);
 
         return strUrl;
+    }
+
+    public static String addParameter(String path, Map<String, String> params) {
+        String URL = path;
+        if (params != null && URL.length() != 0) {
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                try {
+                    URL += entry.getKey() + "=" + entry.getValue();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                URL += "&";
+            }
+            URL = URL.substring(0, URL.length() - 1);
+        }
+        return URL;
     }
 
     public static Calendar dateToCalender(String string, String format){
