@@ -37,7 +37,7 @@ public class RequestHour {
             hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) + BeanConstant.delayHour / 1000);
         }
 
-        Toast.makeText(DisplayHistoryActivity.getContext(), "ï¿½ï¿½ï¿½Ú»ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ÄµÈ´ï¿½...",
+        Toast.makeText(DisplayHistoryActivity.getContext(), "ÕýÔÚ»ñÈ¡Êý¾ÝÖÐ,ÇëÄÍÐÄµÈ´ý...",
                 Toast.LENGTH_LONG).show();
     }
 
@@ -51,7 +51,7 @@ public class RequestHour {
     private static TimerTask requestHourTask = new TimerTask() {
         @Override
         public void run() {
-            // ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
+            // ?????????:???????
             Message message = new Message();
             message.what = 1;
             requestHourHandler.sendMessage(message);
