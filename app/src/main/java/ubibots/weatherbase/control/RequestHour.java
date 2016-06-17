@@ -51,7 +51,7 @@ public class RequestHour {
     private static TimerTask requestHourTask = new TimerTask() {
         @Override
         public void run() {
-            // ?????????:???????
+            // 需要做的事:发送消息
             Message message = new Message();
             message.what = 1;
             requestHourHandler.sendMessage(message);
