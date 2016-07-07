@@ -25,7 +25,7 @@ public class RequestHour {
     }
 
     public void executeRequest() {
-        HourView.setHour(new BeanTabMessage(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+        HourView.setHour(new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>()));
         Calendar hourCalendar = Calendar.getInstance();
         hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) - BeanConstant.delayHour / 1000 * (RequestHourHistory.MAX - 1));
         for (int i = 0; i < RequestHourHistory.MAX; i++) {
@@ -37,7 +37,7 @@ public class RequestHour {
             hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) + BeanConstant.delayHour / 1000);
         }
 
-        Toast.makeText(DisplayHistoryActivity.getContext(), "ÕýÔÚ»ñÈ¡Êý¾ÝÖÐ,ÇëÄÍÐÄµÈ´ý...",
+        Toast.makeText(DisplayHistoryActivity.getContext(), "æ­£åœ¨èŽ·å–æ•°æ®ä¸­,è¯·è€å¿ƒç­‰å¾…...",
                 Toast.LENGTH_LONG).show();
     }
 
@@ -51,7 +51,7 @@ public class RequestHour {
     private static TimerTask requestHourTask = new TimerTask() {
         @Override
         public void run() {
-            // ÐèÒª×öµÄÊÂ:·¢ËÍÏûÏ¢
+            // éœ€è¦åšçš„äº‹:å‘é€æ¶ˆæ¯
             Message message = new Message();
             message.what = 1;
             requestHourHandler.sendMessage(message);

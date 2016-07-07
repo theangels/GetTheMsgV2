@@ -25,7 +25,7 @@ public class RequestDay {
     }
 
     public void executeRequest(){
-        DayView.setDay(new BeanTabMessage(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+        DayView.setDay(new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>()));
         Calendar dayCalendar = Calendar.getInstance();
         dayCalendar.set(Calendar.SECOND, dayCalendar.get(Calendar.SECOND) - BeanConstant.delayDay / 1000 * (RequestDayHistory.MAX - 1));
         for (int i = 0; i < RequestDayHistory.MAX; i++) {
@@ -37,7 +37,7 @@ public class RequestDay {
             dayCalendar.set(Calendar.SECOND, dayCalendar.get(Calendar.SECOND) + BeanConstant.delayDay / 1000);
         }
 
-        Toast.makeText(DisplayHistoryActivity.getContext(), "ÕýÔÚ»ñÈ¡Êý¾ÝÖÐ,ÇëÄÍÐÄµÈ´ý...",
+        Toast.makeText(DisplayHistoryActivity.getContext(), "æ­£åœ¨èŽ·å–æ•°æ®ä¸­,è¯·è€å¿ƒç­‰å¾…...",
                 Toast.LENGTH_LONG).show();
     }
 
@@ -52,7 +52,7 @@ public class RequestDay {
 
         @Override
         public void run() {
-            // ÐèÒª×öµÄÊÂ:·¢ËÍÏûÏ¢
+            // éœ€è¦åšçš„äº‹:å‘é€æ¶ˆæ¯
             Message message = new Message();
             message.what = 1;
             requestDayHandler.sendMessage(message);

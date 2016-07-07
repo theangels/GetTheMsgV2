@@ -2,6 +2,7 @@ package ubibots.weatherbase.ui;
 
 import android.graphics.Color;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -32,21 +33,24 @@ public class ListTab {
         listView.setBackgroundColor(Color.GRAY);
         listView.setCacheColorHint(0);
         final List<String> data = new ArrayList<>();
-        data.add("每时");
-        data.add("每日");
+        data.add("姣忔椂");
+        data.add("姣忔棩");
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(DisplayHistoryActivity.getActivity(), android.R.layout.simple_expandable_list_item_1, data);
         listView.setAdapter(arrayAdapter);
-        listView.setOnItemClickListener((parent, view, position, id) -> {
-            String click = data.get(position);
-            switch (click) {
-                case "每时":
-                    hourVisible();
-                    currentTab = 0;
-                    break;
-                case "每日":
-                    dayVisible();
-                    currentTab = 1;
-                    break;
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String click = data.get(i);
+                switch (click) {
+                    case "姣忔椂":
+                        hourVisible();
+                        currentTab = 0;
+                        break;
+                    case "姣忔棩":
+                        dayVisible();
+                        currentTab = 1;
+                        break;
+                }
             }
         });
         hourVisible();
@@ -78,6 +82,7 @@ public class ListTab {
     private void dayVisible() {
         if (DayView.getDayViewPager() != null) {
             DayView.getDayViewPager().setVisibility(View.VISIBLE);
+            System.out.println("OK!");
             hourInvisible();
         }
         if (DayView.getDayProgressBar().getVisibility() != View.GONE) {

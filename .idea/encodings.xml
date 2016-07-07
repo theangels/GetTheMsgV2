@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/DisplayHistoryActivity.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/control/RequestDay.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/control/RequestDayHistory.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/control/RequestDayStep.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/control/RequestHour.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/control/RequestHourHistory.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/control/RequestHourStep.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/model/BeanConstant.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/model/BeanLineView.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/model/BeanTabMessage.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/ui/DayView.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/ui/DisplayView.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/ui/HourView.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/ui/ListTab.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/util/RequestUtil.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/DisplayHistoryActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/control/RequestDay.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/control/RequestDayHistory.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/control/RequestDayStep.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/control/RequestHour.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/control/RequestHourHistory.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/control/RequestHourStep.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/model/BeanConstant.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/model/BeanLineView.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/model/BeanTabMessage.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/ui/DayView.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/ui/DisplayView.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/ui/HourView.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/ui/ListTab.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/ubibots/weatherbase/util/RequestUtil.java" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

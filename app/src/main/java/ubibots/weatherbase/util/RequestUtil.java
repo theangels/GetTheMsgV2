@@ -19,7 +19,7 @@ import ubibots.weatherbase.ui.DisplayView;
 
 public class RequestUtil {
     public static void flushView(BeanLineView lineView, BeanTabMessage tab, String xName) {
-        //ÎÂ¶È
+        //æ¸©åº¦
         List<Line> temperatureLineList = new ArrayList<>();
         List<PointValue> temperatureValuesList;
         Line temperatureLine;
@@ -88,7 +88,7 @@ public class RequestUtil {
         }
         temperatureLineList.add(temperatureLine);
 
-        //×îºóÏÔÊ¾µã
+        //æœ€åæ˜¾ç¤ºç‚¹
         temperatureValuesList = new ArrayList<>();
         float lastTemperature = tab.getTemperature().get(tab.getTemperature().size()-1).floatValue();
         if(lastTemperature < BeanConstant.DOWNTEMP){
@@ -104,7 +104,7 @@ public class RequestUtil {
         temperatureValuesList.add(new PointValue(tab.getTemperature().size()-1,lastTemperature));
         temperatureLineList.add(temperatureLine);
 
-        //ÉÏÏÂ¿Õ°×
+        //ä¸Šä¸‹ç©ºç™½
         temperatureValuesList = new ArrayList<>();
         temperatureLine = new Line(temperatureValuesList).setColor(Color.BLACK).setCubic(true);
         temperatureLine.setHasPoints(false);
@@ -117,8 +117,8 @@ public class RequestUtil {
         LineChartData temperatureData = new LineChartData();
         temperatureData.setLines(temperatureLineList);
 
-        //×ø±êÖá
-        Axis axisX = new Axis();//XÖá
+        //åæ ‡è½´
+        Axis axisX = new Axis();//Xè½´
         axisX.setHasLines(true);
         axisX.setHasTiltedLabels(true);
         axisX.setTextColor(Color.WHITE);
@@ -127,22 +127,22 @@ public class RequestUtil {
         axisX.setValues(temperatureAxisValue);
         temperatureData.setAxisXBottom(axisX);
 
-        Axis axisY1 = new Axis();//Y1Öá
+        Axis axisY1 = new Axis();//Y1è½´
         axisY1.setHasLines(true);
         axisY1.setTextColor(Color.WHITE);
-        axisY1.setName("ÉãÊÏ¶È/¡æ");
+        axisY1.setName("æ‘„æ°åº¦/â„ƒ");
         axisY1.setMaxLabelChars(4);
         temperatureData.setAxisYLeft(axisY1);
 
-        Axis axisY2 = new Axis();//Y2Öá
+        Axis axisY2 = new Axis();//Y2è½´
         axisY2.setHasLines(true);
         axisY2.setTextColor(Color.WHITE);
-        axisY2.setName("ÉãÊÏ¶È/¡æ");
+        axisY2.setName("æ‘„æ°åº¦/â„ƒ");
         axisY2.setMaxLabelChars(4);
         temperatureData.setAxisYRight(axisY2);
         lineView.getTemperatureView().setLineChartData(temperatureData);
 
-        //Êª¶È
+        //æ¹¿åº¦
         List<Line> humidityLineList = new ArrayList<>();
         List<PointValue> humidityValuesList;
         Line humidityLine;
@@ -208,7 +208,7 @@ public class RequestUtil {
         }
         humidityLineList.add(humidityLine);
 
-        //×îºóÏÔÊ¾µã
+        //æœ€åæ˜¾ç¤ºç‚¹
         humidityValuesList = new ArrayList<>();
         float lastHumidity = tab.getHumidity().get(tab.getHumidity().size()-1).floatValue();
         if(lastHumidity < BeanConstant.DOWNHUMI){
@@ -224,7 +224,7 @@ public class RequestUtil {
         humidityValuesList.add(new PointValue(tab.getHumidity().size()-1,lastHumidity));
         humidityLineList.add(humidityLine);
 
-        //ÉÏÏÂ¿Õ°×
+        //ä¸Šä¸‹ç©ºç™½
         humidityValuesList = new ArrayList<>();
         humidityLine = new Line(humidityValuesList).setColor(Color.BLACK).setCubic(true);
         humidityLine.setHasPoints(false);
@@ -237,8 +237,8 @@ public class RequestUtil {
         LineChartData humidityData = new LineChartData();
         humidityData.setLines(humidityLineList);
 
-        //×ø±êÖá
-        axisX = new Axis();//XÖá
+        //åæ ‡è½´
+        axisX = new Axis();//Xè½´
         axisX.setHasLines(true);
         axisX.setHasTiltedLabels(true);
         axisX.setTextColor(Color.WHITE);
@@ -247,17 +247,17 @@ public class RequestUtil {
         axisX.setValues(humidityAxisValue);
         humidityData.setAxisXBottom(axisX);
 
-        axisY1 = new Axis();//Y1Öá
+        axisY1 = new Axis();//Y1è½´
         axisY1.setHasLines(true);
         axisY1.setTextColor(Color.WHITE);
-        axisY1.setName("Êª¶È/%RH");
+        axisY1.setName("æ¹¿åº¦/%RH");
         axisY1.setMaxLabelChars(4);
         humidityData.setAxisYLeft(axisY1);
 
-        axisY2 = new Axis();//Y2Öá0
+        axisY2 = new Axis();//Y2è½´0
         axisY2.setHasLines(true);
         axisY2.setTextColor(Color.WHITE);
-        axisY2.setName("Êª¶È/%RH");
+        axisY2.setName("æ¹¿åº¦/%RH");
         axisY2.setMaxLabelChars(4);
         humidityData.setAxisYRight(axisY2);
         lineView.getHumidityView().setLineChartData(humidityData);
@@ -324,7 +324,7 @@ public class RequestUtil {
         }
         airLineList.add(airLine);
 
-        //×îºóÏÔÊ¾µã
+        //æœ€åæ˜¾ç¤ºç‚¹
         airValuesList = new ArrayList<>();
         float lastAir = tab.getAir().get(tab.getAir().size()-1).floatValue();
         if(lastAir < BeanConstant.DOWNAIR){
@@ -340,7 +340,7 @@ public class RequestUtil {
         airValuesList.add(new PointValue(tab.getAir().size()-1,lastAir));
         airLineList.add(airLine);
 
-        //ÉÏÏÂ¿Õ°×
+        //ä¸Šä¸‹ç©ºç™½
         airValuesList = new ArrayList<>();
         airLine = new Line(airValuesList).setColor(Color.BLACK).setCubic(true);
         airLine.setHasPoints(false);
@@ -353,8 +353,8 @@ public class RequestUtil {
         LineChartData airData = new LineChartData();
         airData.setLines(airLineList);
 
-        //×ø±êÖá
-        axisX = new Axis();//XÖá
+        //åæ ‡è½´
+        axisX = new Axis();//Xè½´
         axisX.setHasLines(true);
         axisX.setHasTiltedLabels(true);
         axisX.setTextColor(Color.WHITE);
@@ -363,14 +363,14 @@ public class RequestUtil {
         axisX.setValues(airAxisValue);
         airData.setAxisXBottom(axisX);
 
-        axisY1 = new Axis();//Y1Öá
+        axisY1 = new Axis();//Y1è½´
         axisY1.setHasLines(true);
         axisY1.setTextColor(Color.WHITE);
         axisY1.setName("PM2.5/ug/m3");
         axisY1.setMaxLabelChars(4);
         airData.setAxisYLeft(axisY1);
 
-        axisY2 = new Axis();//Y2Öá0
+        axisY2 = new Axis();//Y2è½´0
         axisY2.setHasLines(true);
         axisY2.setTextColor(Color.WHITE);
         axisY2.setName("PM2.5/ug/m3");
@@ -380,17 +380,17 @@ public class RequestUtil {
     }
 
     public static void flushCurrentView(BeanTabMessage tab){
-        String view = "";
-        view += "×îĞÂ¸üĞÂ: " + tab.getDate().get(tab.getDate().size()-1) + "        ";
-        view += "ÎÂ¶È: " + tab.getTemperature().get(tab.getTemperature().size()-1) + " ¡æ        ";
-        view += "Êª¶È: " + tab.getHumidity().get(tab.getTemperature().size()-1) + "%RH        ";
-        view += "PM: " + tab.getAir().get(tab.getTemperature().size()-1) + "¦Ìg/m3        ";
-
-        DisplayView.getTextView().setText(view);
+        String msg;
+        msg = "æ¸©åº¦:"+tab.getTemperature().get(tab.getTemperature().size()-1) + "â„ƒ";
+        DisplayView.getCurrentView().getCurrentTemperature().setText(msg);
+        msg = "æ¹¿åº¦:"+tab.getHumidity().get(tab.getHumidity().size()-1) + "%RH";
+        DisplayView.getCurrentView().getCurrentHumidity().setText(msg);
+        msg = "PM2.5:"+tab.getAir().get(tab.getAir().size()-1) + "Î¼g/m3";
+        DisplayView.getCurrentView().getCurrentPM2_5().setText(msg);
     }
 
     public static void connectFailed() {
-        Toast.makeText(DisplayHistoryActivity.getContext(), "Á¬½ÓÊ§°Ü£¬Çë¼ì²éÍøÂç»·¾³²¢ÖØÆô±¾³ÌĞò...",
+        Toast.makeText(DisplayHistoryActivity.getContext(), "è¿æ¥å¤±è´¥ï¼Œè¯·æ£€æŸ¥ç½‘ç»œç¯å¢ƒå¹¶é‡å¯æœ¬ç¨‹åº...",
                 Toast.LENGTH_SHORT).show();
     }
 }

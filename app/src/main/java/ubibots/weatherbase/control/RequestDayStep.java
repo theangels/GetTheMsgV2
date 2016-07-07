@@ -30,7 +30,7 @@ public class RequestDayStep extends AsyncTask<String, Integer, String> {
         this.time = time;
     }
 
-    //¸Ã·½·¨²¢²»ÔËĞĞÔÚUIÏß³Ìµ±ÖĞ£¬Ö÷ÒªÓÃÓÚÒì²½²Ù×÷£¬ËùÓĞÔÚ¸Ã·½·¨ÖĞ²»ÄÜ¶ÔUIµ±ÖĞµÄ¿Õ¼ä½øĞĞÉèÖÃºÍĞŞ¸Ä
+    //è¯¥æ–¹æ³•å¹¶ä¸è¿è¡Œåœ¨UIçº¿ç¨‹å½“ä¸­ï¼Œä¸»è¦ç”¨äºå¼‚æ­¥æ“ä½œï¼Œæ‰€æœ‰åœ¨è¯¥æ–¹æ³•ä¸­ä¸èƒ½å¯¹UIå½“ä¸­çš„ç©ºé—´è¿›è¡Œè®¾ç½®å’Œä¿®æ”¹
     @Override
     protected String doInBackground(String... params) {
         //System.out.println("Url: " + params[0]);
@@ -39,10 +39,10 @@ public class RequestDayStep extends AsyncTask<String, Integer, String> {
             url = new URL(params[0]);
             strURL = params[0];
             HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
-            urlConn.setDoInput(true); //ÔÊĞíÊäÈëÁ÷£¬¼´ÔÊĞíÏÂÔØ
-            urlConn.setDoOutput(true); //ÔÊĞíÊä³öÁ÷£¬¼´ÔÊĞíÉÏ´«
-            urlConn.setUseCaches(false); //²»Ê¹ÓÃ»º³å
-            urlConn.setRequestMethod("POST"); //Ê¹ÓÃgetÇëÇó
+            urlConn.setDoInput(true); //å…è®¸è¾“å…¥æµï¼Œå³å…è®¸ä¸‹è½½
+            urlConn.setDoOutput(true); //å…è®¸è¾“å‡ºæµï¼Œå³å…è®¸ä¸Šä¼ 
+            urlConn.setUseCaches(false); //ä¸ä½¿ç”¨ç¼“å†²
+            urlConn.setRequestMethod("POST"); //ä½¿ç”¨getè¯·æ±‚
             InputStreamReader in = new InputStreamReader(urlConn.getInputStream());
             BufferedReader bufferedReader = new BufferedReader(in);
             String result = "";
@@ -59,7 +59,7 @@ public class RequestDayStep extends AsyncTask<String, Integer, String> {
         return null;
     }
 
-    //ÔÚdoInBackground·½·¨Ö´ĞĞ½áÊøÖ®ºóÔÚÔËĞĞ£¬²¢ÇÒÔËĞĞÔÚUIÏß³Ìµ±ÖĞ ¿ÉÒÔ¶ÔUI¿Õ¼ä½øĞĞÉèÖÃ
+    //åœ¨doInBackgroundæ–¹æ³•æ‰§è¡Œç»“æŸä¹‹ååœ¨è¿è¡Œï¼Œå¹¶ä¸”è¿è¡Œåœ¨UIçº¿ç¨‹å½“ä¸­ å¯ä»¥å¯¹UIç©ºé—´è¿›è¡Œè®¾ç½®
     @Override
     protected void onPostExecute(String result) {
         if (result != null) {
@@ -87,7 +87,7 @@ public class RequestDayStep extends AsyncTask<String, Integer, String> {
                     air = Double.valueOf(airString);
                 }
 
-                //¶ª°üÖØ·¢
+                //ä¸¢åŒ…é‡å‘
                 if (dateString.length() != 24 || temp <= 0 || humi <= 0 || air < 0) {
                     reconnect(strURL, day);
                     return;
@@ -108,11 +108,11 @@ public class RequestDayStep extends AsyncTask<String, Integer, String> {
                 day.getAir().remove(0);
                 day.getAir().add(air);
 
-                //Ë¢ĞÂ½çÃæ
-                RequestUtil.flushView(DayView.getDayBeanLineView(), day, "ÈÕ Ê±:·Ö");
+                //åˆ·æ–°ç•Œé¢
+                RequestUtil.flushView(DayView.getDayBeanLineView(), day, "æ—¥ æ—¶:åˆ†");
 
                 System.out.println("Time: " + day.getDate().get(MAX - 1) + " " + "Temperature: " + day.getTemperature().get(MAX - 1) + " " + "Humidity: " + day.getHumidity().get(MAX - 1) + " " + "Time: " + time);
-            } else {//¶ª°üÖØ·¢
+            } else {//ä¸¢åŒ…é‡å‘
                 reconnect(strURL, day);
             }
         } else {
@@ -120,7 +120,7 @@ public class RequestDayStep extends AsyncTask<String, Integer, String> {
         }
     }
 
-    //¸Ã·½·¨ÔËĞĞÔÚUIÏß³Ìµ±ÖĞ,²¢ÇÒÔËĞĞÔÚUIÏß³Ìµ±ÖĞ ¿ÉÒÔ¶ÔUI¿Õ¼ä½øĞĞÉèÖÃ
+    //è¯¥æ–¹æ³•è¿è¡Œåœ¨UIçº¿ç¨‹å½“ä¸­,å¹¶ä¸”è¿è¡Œåœ¨UIçº¿ç¨‹å½“ä¸­ å¯ä»¥å¯¹UIç©ºé—´è¿›è¡Œè®¾ç½®
     @Override
     protected void onPreExecute() {
     }

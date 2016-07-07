@@ -5,15 +5,21 @@ import android.widget.TextView;
 import ubibots.weatherbase.DisplayHistoryActivity;
 import ubibots.weatherbase.R;
 import ubibots.weatherbase.control.RequestHour;
+import ubibots.weatherbase.model.BeanCurrentView;
 
 public class DisplayView {
-    private static final TextView textView = (TextView)DisplayHistoryActivity.getActivity().findViewById(R.id.currentView);
+    private static BeanCurrentView currentView;
 
-    public static TextView getTextView() {
-        return textView;
+    public static BeanCurrentView getCurrentView(){
+        return currentView;
     }
 
     public DisplayView() {
+        currentView = new BeanCurrentView();
+        currentView.setCurrentTemperature((TextView) DisplayHistoryActivity.getActivity().findViewById(R.id.currentTemperature));
+        currentView.setCurrentHumidity((TextView) DisplayHistoryActivity.getActivity().findViewById(R.id.currentHumidity));
+        currentView.setCurrentAirPressure((TextView) DisplayHistoryActivity.getActivity().findViewById(R.id.currentAirPressure));
+        currentView.setCurrentPM2_5((TextView) DisplayHistoryActivity.getActivity().findViewById(R.id.currentPM));
         new HourView();
         new RequestHour().executeRequest();
         new DayView();

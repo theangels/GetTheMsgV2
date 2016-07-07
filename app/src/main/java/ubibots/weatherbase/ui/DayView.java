@@ -81,26 +81,26 @@ public class DayView {
 
         initDayDots();
         PagerAdapter dayPagerAdapter = new PagerAdapter() {
-            //¹Ù·½½¨ÒéÕâÃ´Ğ´
+            //å®˜æ–¹å»ºè®®è¿™ä¹ˆå†™
             @Override
             public boolean isViewFromObject(View arg0, Object arg1) {
                 return arg0 == arg1;
             }
 
-            //·µ»ØÒ»¹²ÓĞ¶àÉÙ¸ö½çÃæ
+            //è¿”å›ä¸€å…±æœ‰å¤šå°‘ä¸ªç•Œé¢
             @Override
             public int getCount() {
                 return dayViewList.size();
             }
 
-            //ÊµÀı»¯Ò»¸öitem
+            //å®ä¾‹åŒ–ä¸€ä¸ªitem
             @Override
             public Object instantiateItem(ViewGroup container, int position) {
                 container.addView(dayViewList.get(position));
                 return dayViewList.get(position);
             }
 
-            //Ïú»ÙÒ»¸öitem
+            //é”€æ¯ä¸€ä¸ªitem
             @Override
             public void destroyItem(ViewGroup container, int position, Object object) {
                 container.removeView(dayViewList.get(position));
@@ -127,7 +127,7 @@ public class DayView {
     }
 
     /**
-     * ³õÊ¼»¯µ×²¿µÄµã
+     * åˆå§‹åŒ–åº•éƒ¨çš„ç‚¹
      */
     private void initDayDots() {
         LinearLayout dayPointLayout = (LinearLayout) DisplayHistoryActivity.getActivity().findViewById(R.id.point);
@@ -142,7 +142,7 @@ public class DayView {
 
 
     /**
-     * µ±¹ö¶¯µÄÊ±ºò¸ü»»µãµÄ±³¾°Í¼
+     * å½“æ»šåŠ¨çš„æ—¶å€™æ›´æ¢ç‚¹çš„èƒŒæ™¯å›¾
      */
     private void setDayDots(int position) {
         if (position < 0 || position > dayViewList.size() - 1
@@ -161,9 +161,9 @@ public class DayView {
         spanString.setSpan(imgSpan, 0, 4, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         tv.setText(spanString);
         if (index == 0) {
-            tv.append("ÎÂ¶È");
+            tv.append("æ¸©åº¦");
         } else if(index == 1){
-            tv.append("Êª¶È");
+            tv.append("æ¹¿åº¦");
         }else if(index == 2){
             tv.append("PM2.5");
         }
