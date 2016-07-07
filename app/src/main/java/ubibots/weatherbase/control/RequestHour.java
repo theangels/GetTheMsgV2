@@ -15,9 +15,9 @@ import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanTabMessage;
 import ubibots.weatherbase.ui.HourView;
 import ubibots.weatherbase.util.RequestUtil;
+import ubibots.weatherbase.util.URLUtil;
 
 public class RequestHour {
-
     private static RequestHourHandler requestHourHandler;
 
     public RequestHour() {
@@ -42,7 +42,7 @@ public class RequestHour {
     }
 
     public static void hourHistory(BeanTabMessage hour, Calendar calendar, int id) {
-        String strUrl = RequestUtil.combineUrl((Calendar) calendar.clone());
+        String strUrl = URLUtil.combineUrl((Calendar) calendar.clone());
         RequestHourHistory request = new RequestHourHistory(hour, id, 0);
         request.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, strUrl);
     }
@@ -77,7 +77,7 @@ public class RequestHour {
     }
 
     public static void hourStep(BeanTabMessage hour, Calendar calendar) {
-        String strUrl = RequestUtil.combineUrl((Calendar) calendar.clone());
+        String strUrl = URLUtil.combineUrl((Calendar) calendar.clone());
         RequestHourStep request = new RequestHourStep(hour, 0);
         request.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, strUrl);
     }

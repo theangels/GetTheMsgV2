@@ -15,9 +15,9 @@ import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanTabMessage;
 import ubibots.weatherbase.ui.DayView;
 import ubibots.weatherbase.util.RequestUtil;
+import ubibots.weatherbase.util.URLUtil;
 
 public class RequestDay {
-
     private static RequestDayHandler requestDayHandler;
 
     public RequestDay(){
@@ -42,7 +42,7 @@ public class RequestDay {
     }
 
     public static void dayHistory(BeanTabMessage day, Calendar calendar, int id) {
-        String strUrl = RequestUtil.combineUrl((Calendar) calendar.clone());
+        String strUrl = URLUtil.combineUrl((Calendar) calendar.clone());
         RequestDayHistory request = new RequestDayHistory(day, id, 0);
         request.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, strUrl);
     }
@@ -78,7 +78,7 @@ public class RequestDay {
     }
 
     public static void dayStep(BeanTabMessage day, Calendar calendar) {
-        String strUrl = RequestUtil.combineUrl((Calendar) calendar.clone());
+        String strUrl = URLUtil.combineUrl((Calendar) calendar.clone());
         RequestDayStep request = new RequestDayStep(day, 0);
         request.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, strUrl);
     }

@@ -17,10 +17,10 @@ import java.util.regex.Pattern;
 import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanTabMessage;
 import ubibots.weatherbase.ui.DayView;
+import ubibots.weatherbase.util.DateUtil;
 import ubibots.weatherbase.util.RequestUtil;
 
 public class RequestDayHistory extends AsyncTask<String, Integer, String> {
-
     public final static int MAX = 48;
     private BeanTabMessage day;
     private int id;
@@ -100,7 +100,7 @@ public class RequestDayHistory extends AsyncTask<String, Integer, String> {
                 }
 
                 dateString = dateString.substring(0, 10) + " " + dateString.substring(11, 23);
-                Calendar calendar = RequestUtil.dateToCalender(dateString, "yyyy-MM-dd HH:mm:ss.SSS");
+                Calendar calendar = DateUtil.dateToCalender(dateString, "yyyy-MM-dd HH:mm:ss.SSS");
                 calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + 8);
                 SimpleDateFormat sdf = new SimpleDateFormat("dd HH:mm", Locale.getDefault());
                 dateString = sdf.format(calendar.getTime());
@@ -114,7 +114,7 @@ public class RequestDayHistory extends AsyncTask<String, Integer, String> {
                 //历史数据收集完毕
                 if (day.count == MAX) {
                     //刷新界面
-                    RequestUtil.reflashLineView(DayView.getDayBeanLineView(), day, "日 时:分");
+                    RequestUtil.flushView(DayView.getDayBeanLineView(), day, "日 时:分");
 
                     RequestDay.getRequestDayTimer().schedule(RequestDay.getRequestDayTask(), BeanConstant.delayDay, BeanConstant.delayDay);
                     DayView.getDayProgressBar().setVisibility(View.GONE);

@@ -17,10 +17,10 @@ import java.util.regex.Pattern;
 import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanTabMessage;
 import ubibots.weatherbase.ui.HourView;
+import ubibots.weatherbase.util.DateUtil;
 import ubibots.weatherbase.util.RequestUtil;
 
 public class RequestHourHistory extends AsyncTask<String, Integer, String> {
-
     public final static int MAX = 120;
     private BeanTabMessage hour;
     private int id;
@@ -99,7 +99,7 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
                 }
 
                 dateString = dateString.substring(0, 10) + " " + dateString.substring(11, 23);
-                Calendar calendar = RequestUtil.dateToCalender(dateString, "yyyy-MM-dd HH:mm:ss.SSS");
+                Calendar calendar = DateUtil.dateToCalender(dateString, "yyyy-MM-dd HH:mm:ss.SSS");
                 calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + 8);
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
                 dateString = sdf.format(calendar.getTime());
@@ -113,7 +113,8 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
                 //历史数据收集完毕
                 if (hour.count == MAX) {
                     //刷新界面
-                    RequestUtil.reflashLineView(HourView.getHourBeanLineView(), hour, "时:分:秒");
+                    RequestUtil.flushView(HourView.getHourBeanLineView(), hour, "时:分:秒");
+                    RequestUtil.flushCurrentView(hour);
 
                     RequestHour.getRequestHourTimer().schedule(RequestHour.getRequestHourTask(), BeanConstant.delayHour, BeanConstant.delayHour);
                     HourView.getHourProgressBar().setVisibility(View.GONE);

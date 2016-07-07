@@ -3,7 +3,6 @@ package ubibots.weatherbase.model;
 import lecho.lib.hellocharts.view.LineChartView;
 
 public class BeanLineView {
-
     LineChartView temperatureView;
     LineChartView humidityView;
     LineChartView airView;

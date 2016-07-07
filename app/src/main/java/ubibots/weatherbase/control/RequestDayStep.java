@@ -16,10 +16,10 @@ import java.util.regex.Pattern;
 import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanTabMessage;
 import ubibots.weatherbase.ui.DayView;
+import ubibots.weatherbase.util.DateUtil;
 import ubibots.weatherbase.util.RequestUtil;
 
 public class RequestDayStep extends AsyncTask<String, Integer, String> {
-
     public final static int MAX = 48;
     private BeanTabMessage day;
     private String strURL;
@@ -94,7 +94,7 @@ public class RequestDayStep extends AsyncTask<String, Integer, String> {
                 }
 
                 dateString = dateString.substring(0, 10) + " " + dateString.substring(11, 23);
-                Calendar calendar = RequestUtil.dateToCalender(dateString,"yyyy-MM-dd HH:mm:ss.SSS");
+                Calendar calendar = DateUtil.dateToCalender(dateString,"yyyy-MM-dd HH:mm:ss.SSS");
                 calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + 8);
                 SimpleDateFormat sdf = new SimpleDateFormat("dd HH:mm", Locale.getDefault());
                 dateString = sdf.format(calendar.getTime());
@@ -109,7 +109,7 @@ public class RequestDayStep extends AsyncTask<String, Integer, String> {
                 day.getAir().add(air);
 
                 //刷新界面
-                RequestUtil.reflashLineView(DayView.getDayBeanLineView(), day, "日 时:分");
+                RequestUtil.flushView(DayView.getDayBeanLineView(), day, "日 时:分");
 
                 System.out.println("Time: " + day.getDate().get(MAX - 1) + " " + "Temperature: " + day.getTemperature().get(MAX - 1) + " " + "Humidity: " + day.getHumidity().get(MAX - 1) + " " + "Time: " + time);
             } else {//丢包重发

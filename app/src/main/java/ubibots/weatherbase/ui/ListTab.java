@@ -13,7 +13,6 @@ import ubibots.weatherbase.R;
 import ubibots.weatherbase.DisplayHistoryActivity;
 
 public class ListTab {
-
     private int currentTab;
     private ListView listView;
     private LinearLayout point;

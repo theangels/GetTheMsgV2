@@ -25,7 +25,6 @@ import ubibots.weatherbase.model.BeanLineView;
 import ubibots.weatherbase.model.BeanTabMessage;
 
 public class DayView {
-
     private static BeanLineView dayBeanLineView;
     private static BeanTabMessage day;
     private static List<View> dayViewList;

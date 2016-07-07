@@ -3,13 +3,8 @@ package ubibots.weatherbase.util;
 import android.graphics.Color;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
@@ -20,29 +15,11 @@ import ubibots.weatherbase.DisplayHistoryActivity;
 import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanLineView;
 import ubibots.weatherbase.model.BeanTabMessage;
+import ubibots.weatherbase.ui.DisplayView;
 
 public class RequestUtil {
-
-    public static String UTCDateFormat(Calendar calendar) {
-        String UTCDate;
-        SimpleDateFormat sdf;
-        Calendar tmp = (Calendar) calendar.clone();
-        tmp.set(Calendar.HOUR_OF_DAY, tmp.get(Calendar.HOUR_OF_DAY) - 8);
-        sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        UTCDate = sdf.format(tmp.getTime()) + "T";
-        sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-        UTCDate += sdf.format(tmp.getTime()) + ".";
-        sdf = new SimpleDateFormat("SSS", Locale.getDefault());
-        UTCDate += sdf.format(tmp.getTime()) + "Z";
-        return UTCDate;
-    }
-
-    public static void connectFailed() {
-        Toast.makeText(DisplayHistoryActivity.getContext(), "连接失败，请检查网络环境并重启本程序...",
-                Toast.LENGTH_SHORT).show();
-    }
-
-    public static void reflashLineView(BeanLineView lineView, BeanTabMessage tab, String xName) {
+    public static void flushView(BeanLineView lineView, BeanTabMessage tab, String xName) {
+        //温度
         List<Line> temperatureLineList = new ArrayList<>();
         List<PointValue> temperatureValuesList;
         Line temperatureLine;
@@ -52,7 +29,7 @@ public class RequestUtil {
         final int UPLINE = 2;
         int state = -1;
         temperatureValuesList = new ArrayList<>();
-        temperatureLine = new Line(temperatureValuesList).setColor(Color.BLACK).setCubic(false);
+        temperatureLine = new Line(temperatureValuesList).setColor(Color.BLACK).setCubic(true);
         temperatureLine.setHasPoints(false);
         temperatureLine.setHasLines(false);
         temperatureLine = null;
@@ -69,7 +46,7 @@ public class RequestUtil {
                     tmp = tab.getTemperature().get(i - 1).floatValue();
                 }
                 temperatureValuesList = new ArrayList<>();
-                temperatureLine = new Line(temperatureValuesList).setColor(Color.BLUE).setCubic(false);
+                temperatureLine = new Line(temperatureValuesList).setColor(Color.BLUE).setCubic(true);
                 temperatureLine.setHasPoints(false);
                 if (tmp != -1) {
                     temperatureValuesList.add(new PointValue(i - 1, tmp));
@@ -83,7 +60,7 @@ public class RequestUtil {
                     tmp = tab.getTemperature().get(i - 1).floatValue();
                 }
                 temperatureValuesList = new ArrayList<>();
-                temperatureLine = new Line(temperatureValuesList).setColor(Color.GREEN).setCubic(false);
+                temperatureLine = new Line(temperatureValuesList).setColor(Color.GREEN).setCubic(true);
                 temperatureLine.setHasPoints(false);
                 if (tmp != -1) {
                     temperatureValuesList.add(new PointValue(i - 1, tmp));
@@ -97,7 +74,7 @@ public class RequestUtil {
                     tmp = tab.getTemperature().get(i - 1).floatValue();
                 }
                 temperatureValuesList = new ArrayList<>();
-                temperatureLine = new Line(temperatureValuesList).setColor(Color.RED).setCubic(false);
+                temperatureLine = new Line(temperatureValuesList).setColor(Color.RED).setCubic(true);
                 temperatureLine.setHasPoints(false);
                 if (tmp != -1) {
                     temperatureValuesList.add(new PointValue(i - 1, tmp));
@@ -111,8 +88,25 @@ public class RequestUtil {
         }
         temperatureLineList.add(temperatureLine);
 
+        //最后显示点
         temperatureValuesList = new ArrayList<>();
-        temperatureLine = new Line(temperatureValuesList).setColor(Color.BLACK).setCubic(false);
+        float lastTemperature = tab.getTemperature().get(tab.getTemperature().size()-1).floatValue();
+        if(lastTemperature < BeanConstant.DOWNTEMP){
+            temperatureLine = new Line(temperatureValuesList).setColor(Color.BLUE).setCubic(true);
+        }else if(lastTemperature <= BeanConstant.UPTEMP){
+            temperatureLine = new Line(temperatureValuesList).setColor(Color.GREEN).setCubic(true);
+        }else{
+            temperatureLine = new Line(temperatureValuesList).setColor(Color.RED).setCubic(true);
+        }
+        temperatureLine.setHasPoints(true);
+        temperatureLine.setHasLines(false);
+        temperatureLine.setHasLabels(true);
+        temperatureValuesList.add(new PointValue(tab.getTemperature().size()-1,lastTemperature));
+        temperatureLineList.add(temperatureLine);
+
+        //上下空白
+        temperatureValuesList = new ArrayList<>();
+        temperatureLine = new Line(temperatureValuesList).setColor(Color.BLACK).setCubic(true);
         temperatureLine.setHasPoints(false);
         temperatureLine.setHasLines(false);
         float mm = maxTemperature - minTemperature;
@@ -148,14 +142,14 @@ public class RequestUtil {
         temperatureData.setAxisYRight(axisY2);
         lineView.getTemperatureView().setLineChartData(temperatureData);
 
-
+        //湿度
         List<Line> humidityLineList = new ArrayList<>();
         List<PointValue> humidityValuesList;
         Line humidityLine;
         List<AxisValue> humidityAxisValue = new ArrayList<>();
         state = -1;
         humidityValuesList = new ArrayList<>();
-        humidityLine = new Line(humidityValuesList).setColor(Color.BLACK).setCubic(false);
+        humidityLine = new Line(humidityValuesList).setColor(Color.BLACK).setCubic(true);
         humidityLine.setHasPoints(false);
         humidityLine.setHasLines(false);
         humidityLine = null;
@@ -172,7 +166,7 @@ public class RequestUtil {
                     tmp = tab.getHumidity().get(i - 1).floatValue();
                 }
                 humidityValuesList = new ArrayList<>();
-                humidityLine = new Line(humidityValuesList).setColor(Color.BLUE).setCubic(false);
+                humidityLine = new Line(humidityValuesList).setColor(Color.BLUE).setCubic(true);
                 humidityLine.setHasPoints(false);
                 if (tmp != -1) {
                     humidityValuesList.add(new PointValue(i - 1, tmp));
@@ -186,7 +180,7 @@ public class RequestUtil {
                     tmp = tab.getHumidity().get(i - 1).floatValue();
                 }
                 humidityValuesList = new ArrayList<>();
-                humidityLine = new Line(humidityValuesList).setColor(Color.GREEN).setCubic(false);
+                humidityLine = new Line(humidityValuesList).setColor(Color.GREEN).setCubic(true);
                 humidityLine.setHasPoints(false);
                 if (tmp != -1) {
                     humidityValuesList.add(new PointValue(i - 1, tmp));
@@ -200,7 +194,7 @@ public class RequestUtil {
                     tmp = tab.getHumidity().get(i - 1).floatValue();
                 }
                 humidityValuesList = new ArrayList<>();
-                humidityLine = new Line(humidityValuesList).setColor(Color.RED).setCubic(false);
+                humidityLine = new Line(humidityValuesList).setColor(Color.RED).setCubic(true);
                 humidityLine.setHasPoints(false);
                 if (tmp != -1) {
                     humidityValuesList.add(new PointValue(i - 1, tmp));
@@ -214,8 +208,25 @@ public class RequestUtil {
         }
         humidityLineList.add(humidityLine);
 
+        //最后显示点
         humidityValuesList = new ArrayList<>();
-        humidityLine = new Line(humidityValuesList).setColor(Color.BLACK).setCubic(false);
+        float lastHumidity = tab.getHumidity().get(tab.getHumidity().size()-1).floatValue();
+        if(lastHumidity < BeanConstant.DOWNHUMI){
+            humidityLine = new Line(humidityValuesList).setColor(Color.BLUE).setCubic(true);
+        }else if(lastHumidity <= BeanConstant.UPHUMI){
+            humidityLine = new Line(humidityValuesList).setColor(Color.GREEN).setCubic(true);
+        }else{
+            humidityLine = new Line(humidityValuesList).setColor(Color.RED).setCubic(true);
+        }
+        humidityLine.setHasPoints(true);
+        humidityLine.setHasLines(false);
+        humidityLine.setHasLabels(true);
+        humidityValuesList.add(new PointValue(tab.getHumidity().size()-1,lastHumidity));
+        humidityLineList.add(humidityLine);
+
+        //上下空白
+        humidityValuesList = new ArrayList<>();
+        humidityLine = new Line(humidityValuesList).setColor(Color.BLACK).setCubic(true);
         humidityLine.setHasPoints(false);
         humidityLine.setHasLines(false);
         mm = maxHumidity - minHumidity;
@@ -251,6 +262,7 @@ public class RequestUtil {
         humidityData.setAxisYRight(axisY2);
         lineView.getHumidityView().setLineChartData(humidityData);
 
+        //PM2.5
         List<Line> airLineList = new ArrayList<>();
         List<PointValue> airValuesList;
         Line airLine = null;
@@ -270,7 +282,7 @@ public class RequestUtil {
                     tmp = tab.getAir().get(i - 1).floatValue();
                 }
                 airValuesList = new ArrayList<>();
-                airLine = new Line(airValuesList).setColor(Color.GREEN).setCubic(false);
+                airLine = new Line(airValuesList).setColor(Color.GREEN).setCubic(true);
                 airLine.setHasPoints(false);
                 if (tmp != -1) {
                     airValuesList.add(new PointValue(i - 1, tmp));
@@ -284,7 +296,7 @@ public class RequestUtil {
                     tmp = tab.getAir().get(i - 1).floatValue();
                 }
                 airValuesList = new ArrayList<>();
-                airLine = new Line(airValuesList).setColor(Color.BLUE).setCubic(false);
+                airLine = new Line(airValuesList).setColor(Color.BLUE).setCubic(true);
                 airLine.setHasPoints(false);
                 if (tmp != -1) {
                     airValuesList.add(new PointValue(i - 1, tmp));
@@ -298,7 +310,7 @@ public class RequestUtil {
                     tmp = tab.getAir().get(i - 1).floatValue();
                 }
                 airValuesList = new ArrayList<>();
-                airLine = new Line(airValuesList).setColor(Color.RED).setCubic(false);
+                airLine = new Line(airValuesList).setColor(Color.RED).setCubic(true);
                 airLine.setHasPoints(false);
                 if (tmp != -1) {
                     airValuesList.add(new PointValue(i - 1, tmp));
@@ -312,8 +324,25 @@ public class RequestUtil {
         }
         airLineList.add(airLine);
 
+        //最后显示点
         airValuesList = new ArrayList<>();
-        airLine = new Line(airValuesList).setColor(Color.BLACK).setCubic(false);
+        float lastAir = tab.getAir().get(tab.getAir().size()-1).floatValue();
+        if(lastAir < BeanConstant.DOWNAIR){
+            airLine = new Line(airValuesList).setColor(Color.GREEN).setCubic(true);
+        }else if(lastAir <= BeanConstant.UPAIR){
+            airLine = new Line(airValuesList).setColor(Color.BLUE).setCubic(true);
+        }else{
+            airLine = new Line(airValuesList).setColor(Color.RED).setCubic(true);
+        }
+        airLine.setHasPoints(true);
+        airLine.setHasLines(false);
+        airLine.setHasLabels(true);
+        airValuesList.add(new PointValue(tab.getAir().size()-1,lastAir));
+        airLineList.add(airLine);
+
+        //上下空白
+        airValuesList = new ArrayList<>();
+        airLine = new Line(airValuesList).setColor(Color.BLACK).setCubic(true);
         airLine.setHasPoints(false);
         airLine.setHasLines(false);
         mm = maxAir - minAir;
@@ -350,66 +379,18 @@ public class RequestUtil {
         lineView.getAirView().setLineChartData(airData);
     }
 
-    public static String combineUrl(Calendar calendar) {
-        String ipAddress = "zucc.cloud.thingworx.com:80";
-        String appKey = "9653e971-e905-472e-acae-57bab94e8057";
-        String things = "WeatherBase";
-        String service;
-        String strUrl;
-        String startDate;
-        String endDate;
-        Calendar tmp = (Calendar) calendar.clone();
+    public static void flushCurrentView(BeanTabMessage tab){
+        String view = "";
+        view += "最新更新: " + tab.getDate().get(tab.getDate().size()-1) + "        ";
+        view += "温度: " + tab.getTemperature().get(tab.getTemperature().size()-1) + " ℃        ";
+        view += "湿度: " + tab.getHumidity().get(tab.getTemperature().size()-1) + "%RH        ";
+        view += "PM: " + tab.getAir().get(tab.getTemperature().size()-1) + "μg/m3        ";
 
-        endDate = RequestUtil.UTCDateFormat(tmp);
-        tmp.set(Calendar.YEAR, tmp.get(Calendar.YEAR) - 1);
-        startDate = RequestUtil.UTCDateFormat(tmp);
-
-        service = "QueryPropertyHistory";
-        strUrl = "http://"
-                + ipAddress
-                + "/Thingworx"
-                + "/Things/" + things
-                + "/Services/" + service + "?";
-
-        Map<String, String> params;
-        params = new HashMap<>();
-        params.put("method", "post");
-        params.put("appKey", appKey);
-        params.put("startDate", startDate);
-        params.put("endDate", endDate);
-        params.put("maxItems", "1");
-        params.put("oldestFirst", "false");
-
-        strUrl = RequestUtil.addParameter(strUrl, params);
-
-        return strUrl;
+        DisplayView.getTextView().setText(view);
     }
 
-    public static String addParameter(String path, Map<String, String> params) {
-        String URL = path;
-        if (params != null && URL.length() != 0) {
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                try {
-                    URL += entry.getKey() + "=" + entry.getValue();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                URL += "&";
-            }
-            URL = URL.substring(0, URL.length() - 1);
-        }
-        return URL;
-    }
-
-    public static Calendar dateToCalender(String string, String format){
-        Calendar calendar = null;
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
-            calendar = Calendar.getInstance();
-            calendar.setTime(sdf.parse(string));
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return calendar;
+    public static void connectFailed() {
+        Toast.makeText(DisplayHistoryActivity.getContext(), "连接失败，请检查网络环境并重启本程序...",
+                Toast.LENGTH_SHORT).show();
     }
 }

@@ -25,7 +25,6 @@ import ubibots.weatherbase.model.BeanLineView;
 import ubibots.weatherbase.model.BeanTabMessage;
 
 public class HourView {
-
     private static BeanLineView hourBeanLineView;
     private static BeanTabMessage hour;
     private static List<View> hourViewList;
