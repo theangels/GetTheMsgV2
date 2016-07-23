@@ -1,6 +1,8 @@
 package ubibots.weatherbase.control;
 
 import android.os.AsyncTask;
+import android.text.LoginFilter;
+import android.util.Log;
 import android.view.View;
 
 import java.io.BufferedReader;
@@ -72,42 +74,71 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
             ArrayList<String> tmp = new ArrayList<>();
             while (matcher.find()) {
                 tmp.add(matcher.group(1));
+                if (tmp.size() == 8) {
+                    break;
+                }
             }
 
-            if (tmp.size() >= 4) {
-                String dateString = tmp.get(0);
-                double temp = 0;
-                String tempString = tmp.get(1);
+            if (tmp.size() >= 8) {
+                String tempString = tmp.get(0);
+                double t = 0;
                 if (!tempString.equals("---")) {
-                    temp = Double.valueOf(tempString);
+                    t = Double.valueOf(tempString);
                 }
-                String humiString = tmp.get(2);
-                double humi = 0;
-                if(!humiString.equals("---")){
-                    humi = Double.valueOf(humiString);
+                String rainFallString = tmp.get(1);
+                double r = 0;
+                if(!rainFallString.equals("---")){
+                    r = Double.valueOf(rainFallString);
                 }
-                String airString = tmp.get(3);
-                double air = 0;
+                String humidityString = tmp.get(2);
+                double h = 0;
+                if(!humidityString.equals("---")){
+                    h = Double.valueOf(humidityString);
+                }
+                String windSpeedString = tmp.get(3);
+                double s = 0;
+                if(!windSpeedString.equals("---")){
+                    s = Double.valueOf(windSpeedString);
+                }
+                String airString = tmp.get(4);
+                double a = 0;
                 if(!airString.equals("---")){
-                    air = Double.valueOf(airString);
+                    a = Double.valueOf(airString);
                 }
+                String windDirectionString = tmp.get(5);
+                double d = 0;
+                if(!windDirectionString.equals("---")){
+                    d = Double.valueOf(windDirectionString);
+                }
+                String pressureString = tmp.get(6);
+                double p = 0;
+                if(!pressureString.equals("---")){
+                    p = Double.valueOf(pressureString);
+                }
+                String timeStampString = tmp.get(7);
+                timeStampString = timeStampString.replace("&#x3a;",":");
+                timeStampString = timeStampString.replace("&#x2b;","+");
 
                 //丢包重发
-                if (dateString.length() != 24 || temp < 0 || humi < 0 || air < 0) {
+                if (t < 0 || r < 0 || h < 0 || s < 0 || a < 0 || d < 0 || p < 0 || timeStampString.length() != 29) {
                     reconnect(strURL, hour, id);
                     return;
                 }
 
-                dateString = dateString.substring(0, 10) + " " + dateString.substring(11, 23);
-                Calendar calendar = DateUtil.dateToCalender(dateString, "yyyy-MM-dd HH:mm:ss.SSS");
-                calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + 8);
+                timeStampString = timeStampString.substring(0, 10) + " " + timeStampString.substring(11, 23);
+                Calendar calendar = DateUtil.dateToCalender(timeStampString, "yyyy-MM-dd HH:mm:ss.SSS");
+                calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY));
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-                dateString = sdf.format(calendar.getTime());
+                timeStampString = sdf.format(calendar.getTime());
 
-                hour.getDate().set(id, dateString);
-                hour.getTemperature().set(id, temp);
-                hour.getHumidity().set(id, humi);
-                hour.getAir().set(id, air);
+                hour.getTemperature().set(id, t);
+                hour.getRainFall().set(id, r);
+                hour.getHumidity().set(id, h);
+                hour.getWindSpeed().set(id, s);
+                hour.getAir().set(id, a);
+                hour.getWindDirection().set(id, d);
+                hour.getPressure().set(id,p);
+                hour.getTimeStamp().set(id, timeStampString);
                 hour.count++;
 
                 //历史数据收集完毕
@@ -122,12 +153,14 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
                     new RequestDay().executeRequest();
                 }
                 HourView.getHourProgressBar().setProgress(100 * hour.count / MAX);
-                System.out.println("Time: " + hour.getDate().get(id) + " " + "Temperature: " + hour.getTemperature().get(id) + " " + "Humidity: " + hour.getHumidity().get(id) + " " + "Num: " + id + " " + "Count: " + hour.count + " " + "Time: " + time);
+                System.out.println("Time: " + hour.getTimeStamp().get(id) + " " + "Temperature: " + hour.getTemperature().get(id) + " " + "Humidity: " + hour.getHumidity().get(id) + " " + "Num: " + id + " " + "Count: " + hour.count + " " + "Time: " + time);
             } else {//丢包重发
+                Log.e("Tag", "数据错误");
                 reconnect(strURL, hour, id);
             }
         } else {
-            RequestUtil.connectFailed();
+            Log.e("Tag", "没有数据");
+            reconnect(strURL, hour, id);
         }
     }
 
@@ -139,10 +172,24 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
     public void reconnect(String strURL, BeanTabMessage hour, int id) {
         int time = this.time + 1;
         if (time <= BeanConstant.MAXTIME) {
-            RequestHourHistory another = new RequestHourHistory(hour, id, time + 1);
+            RequestHourHistory another = new RequestHourHistory(hour, id, time);
             System.out.println("time: " + time);
             System.out.println(strURL);
             another.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, strURL);
+        }else {
+            hour.count++;
+            if (hour.count == MAX) {
+                //刷新界面
+                RequestUtil.flushView(HourView.getHourBeanLineView(), hour, "时:分:秒");
+                RequestUtil.flushCurrentView(hour);
+
+                RequestHour.getRequestHourTimer().schedule(RequestHour.getRequestHourTask(), BeanConstant.delayHour, BeanConstant.delayHour);
+                HourView.getHourProgressBar().setVisibility(View.GONE);
+
+                new RequestDay().executeRequest();
+            }
+            HourView.getHourProgressBar().setProgress(100 * hour.count / MAX);
+            RequestUtil.connectFailed();
         }
     }
 }

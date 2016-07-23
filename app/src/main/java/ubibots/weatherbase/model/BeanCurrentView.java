@@ -1,5 +1,6 @@
 package ubibots.weatherbase.model;
 
+
 import android.widget.TextView;
 
 public class BeanCurrentView {

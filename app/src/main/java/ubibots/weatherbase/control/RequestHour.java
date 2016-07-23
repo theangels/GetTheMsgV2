@@ -25,14 +25,18 @@ public class RequestHour {
     }
 
     public void executeRequest() {
-        HourView.setHour(new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>()));
+        HourView.setHour(new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>()));
         Calendar hourCalendar = Calendar.getInstance();
         hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) - BeanConstant.delayHour / 1000 * (RequestHourHistory.MAX - 1));
         for (int i = 0; i < RequestHourHistory.MAX; i++) {
-            HourView.getHour().getDate().add("");
             HourView.getHour().getTemperature().add(0.0);
+            HourView.getHour().getRainFall().add(0.0);
             HourView.getHour().getHumidity().add(0.0);
+            HourView.getHour().getWindSpeed().add(0.0);
             HourView.getHour().getAir().add(0.0);
+            HourView.getHour().getWindDirection().add(0.0);
+            HourView.getHour().getPressure().add(0.0);
+            HourView.getHour().getTimeStamp().add("");
             hourHistory(HourView.getHour(), hourCalendar, i);
             hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) + BeanConstant.delayHour / 1000);
         }

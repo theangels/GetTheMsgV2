@@ -84,7 +84,7 @@ public class RequestUtil {
             } else {
                 temperatureValuesList.add(new PointValue(i, tmpTemperature));
             }
-            temperatureAxisValue.add(new AxisValue(i).setLabel(tab.getDate().get(i)));
+            temperatureAxisValue.add(new AxisValue(i).setLabel(tab.getTimeStamp().get(i)));
         }
         temperatureLineList.add(temperatureLine);
 
@@ -204,7 +204,7 @@ public class RequestUtil {
             } else {
                 humidityValuesList.add(new PointValue(i, tmpHumidity));
             }
-            humidityAxisValue.add(new AxisValue(i).setLabel(tab.getDate().get(i)));
+            humidityAxisValue.add(new AxisValue(i).setLabel(tab.getTimeStamp().get(i)));
         }
         humidityLineList.add(humidityLine);
 
@@ -320,7 +320,7 @@ public class RequestUtil {
             } else {
                 airValuesList.add(new PointValue(i, tmpAir));
             }
-            airAxisValue.add(new AxisValue(i).setLabel(tab.getDate().get(i)));
+            airAxisValue.add(new AxisValue(i).setLabel(tab.getTimeStamp().get(i)));
         }
         airLineList.add(airLine);
 
@@ -387,10 +387,12 @@ public class RequestUtil {
         DisplayView.getCurrentView().getCurrentHumidity().setText(msg);
         msg = "PM2.5:"+tab.getAir().get(tab.getAir().size()-1) + "μg/m3";
         DisplayView.getCurrentView().getCurrentPM2_5().setText(msg);
+        msg = "气压:"+tab.getPressure().get(tab.getPressure().size()-1) + "KPa";
+        DisplayView.getCurrentView().getCurrentAirPressure().setText(msg);
     }
 
     public static void connectFailed() {
-        Toast.makeText(DisplayHistoryActivity.getContext(), "连接失败，请检查网络环境并重启本程序...",
+        Toast.makeText(DisplayHistoryActivity.getContext(), "获取数据失败，可能该时间段不存在数据",
                 Toast.LENGTH_SHORT).show();
     }
 }

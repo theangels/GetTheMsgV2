@@ -14,25 +14,30 @@ import ubibots.weatherbase.DisplayHistoryActivity;
 import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanTabMessage;
 import ubibots.weatherbase.ui.DayView;
+import ubibots.weatherbase.ui.HourView;
 import ubibots.weatherbase.util.RequestUtil;
 import ubibots.weatherbase.util.URLUtil;
 
 public class RequestDay {
     private static RequestDayHandler requestDayHandler;
 
-    public RequestDay(){
+    public RequestDay() {
         requestDayHandler = new RequestDayHandler();
     }
 
-    public void executeRequest(){
-        DayView.setDay(new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>()));
+    public void executeRequest() {
+        DayView.setDay(new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>()));
         Calendar dayCalendar = Calendar.getInstance();
         dayCalendar.set(Calendar.SECOND, dayCalendar.get(Calendar.SECOND) - BeanConstant.delayDay / 1000 * (RequestDayHistory.MAX - 1));
         for (int i = 0; i < RequestDayHistory.MAX; i++) {
-            DayView.getDay().getDate().add("");
             DayView.getDay().getTemperature().add(0.0);
+            DayView.getDay().getRainFall().add(0.0);
             DayView.getDay().getHumidity().add(0.0);
+            DayView.getDay().getWindSpeed().add(0.0);
             DayView.getDay().getAir().add(0.0);
+            DayView.getDay().getWindDirection().add(0.0);
+            DayView.getDay().getPressure().add(0.0);
+            DayView.getDay().getTimeStamp().add("");
             dayHistory(DayView.getDay(), dayCalendar, i);
             dayCalendar.set(Calendar.SECOND, dayCalendar.get(Calendar.SECOND) + BeanConstant.delayDay / 1000);
         }
@@ -71,7 +76,7 @@ public class RequestDay {
         public void handleMessage(Message msg) {
             if (msg.what == 1) {
                 Calendar calendar = Calendar.getInstance();
-                dayStep(DayView.getDay(),calendar);
+                dayStep(DayView.getDay(), calendar);
             }
             super.handleMessage(msg);
         }

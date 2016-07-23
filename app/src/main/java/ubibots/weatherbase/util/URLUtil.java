@@ -6,8 +6,8 @@ import java.util.Map;
 
 public class URLUtil {
     public static String combineUrl(Calendar calendar) {
-        String ipAddress = "zucc.cloud.thingworx.com:80";
-        String appKey = "9653e971-e905-472e-acae-57bab94e8057";
+        String ipAddress = "10.66.15.37:80";
+        String appKey = "390a960f-0945-4609-aecb-b439806da912";
         String things = "WeatherBase";
         String service;
         String strUrl;

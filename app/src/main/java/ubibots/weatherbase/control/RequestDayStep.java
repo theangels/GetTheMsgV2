@@ -1,6 +1,7 @@
 package ubibots.weatherbase.control;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -68,55 +69,90 @@ public class RequestDayStep extends AsyncTask<String, Integer, String> {
             ArrayList<String> tmp = new ArrayList<>();
             while (matcher.find()) {
                 tmp.add(matcher.group(1));
+                if (tmp.size() == 8) {
+                    break;
+                }
             }
-            if (tmp.size() >= 3) {
-                String dateString = tmp.get(0);
-                double temp = 0;
-                String tempString = tmp.get(1);
+            if (tmp.size() >= 8) {
+                String tempString = tmp.get(0);
+                double t = 0;
                 if (!tempString.equals("---")) {
-                    temp = Double.valueOf(tempString);
+                    t = Double.valueOf(tempString);
                 }
-                String humiString = tmp.get(2);
-                double humi = 0;
-                if(!humiString.equals("---")){
-                    humi = Double.valueOf(humiString);
+                String rainFallString = tmp.get(1);
+                double r = 0;
+                if(!rainFallString.equals("---")){
+                    r = Double.valueOf(rainFallString);
                 }
-                String airString = tmp.get(3);
-                double air = 0;
+                String humidityString = tmp.get(2);
+                double h = 0;
+                if(!humidityString.equals("---")){
+                    h = Double.valueOf(humidityString);
+                }
+                String windSpeedString = tmp.get(3);
+                double s = 0;
+                if(!windSpeedString.equals("---")){
+                    s = Double.valueOf(windSpeedString);
+                }
+                String airString = tmp.get(4);
+                double a = 0;
                 if(!airString.equals("---")){
-                    air = Double.valueOf(airString);
+                    a = Double.valueOf(airString);
                 }
+                String windDirectionString = tmp.get(5);
+                double d = 0;
+                if(!windDirectionString.equals("---")){
+                    d = Double.valueOf(windDirectionString);
+                }
+                String pressureString = tmp.get(6);
+                double p = 0;
+                if(!pressureString.equals("---")){
+                    p = Double.valueOf(pressureString);
+                }
+                String timeStampString = tmp.get(7);
+                timeStampString = timeStampString.replace("&#x3a;",":");
+                timeStampString = timeStampString.replace("&#x2b;","+");
 
                 //丢包重发
-                if (dateString.length() != 24 || temp <= 0 || humi <= 0 || air < 0) {
+                if (t < 0 || r < 0 || h < 0 || s < 0 || a < 0 || d < 0 || p < 0 || timeStampString.length() != 29) {
                     reconnect(strURL, day);
                     return;
                 }
 
-                dateString = dateString.substring(0, 10) + " " + dateString.substring(11, 23);
-                Calendar calendar = DateUtil.dateToCalender(dateString,"yyyy-MM-dd HH:mm:ss.SSS");
-                calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + 8);
-                SimpleDateFormat sdf = new SimpleDateFormat("dd HH:mm", Locale.getDefault());
-                dateString = sdf.format(calendar.getTime());
+                timeStampString = timeStampString.substring(0, 10) + " " + timeStampString.substring(11, 23);
+                Calendar calendar = DateUtil.dateToCalender(timeStampString, "yyyy-MM-dd HH:mm:ss.SSS");
+                calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY));
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+                timeStampString = sdf.format(calendar.getTime());
 
-                day.getDate().remove(0);
-                day.getDate().add(dateString);
                 day.getTemperature().remove(0);
-                day.getTemperature().add(temp);
+                day.getTemperature().add(t);
+                day.getRainFall().remove(0);
+                day.getRainFall().add(r);
                 day.getHumidity().remove(0);
-                day.getHumidity().add(humi);
+                day.getHumidity().add(h);
+                day.getWindSpeed().remove(0);
+                day.getWindSpeed().add(s);
                 day.getAir().remove(0);
-                day.getAir().add(air);
+                day.getAir().add(a);
+                day.getWindDirection().remove(0);
+                day.getWindDirection().add(d);
+                day.getPressure().remove(0);
+                day.getPressure().add(p);
+                day.getTimeStamp().remove(0);
+                day.getTimeStamp().add(timeStampString);
 
                 //刷新界面
                 RequestUtil.flushView(DayView.getDayBeanLineView(), day, "日 时:分");
 
-                System.out.println("Time: " + day.getDate().get(MAX - 1) + " " + "Temperature: " + day.getTemperature().get(MAX - 1) + " " + "Humidity: " + day.getHumidity().get(MAX - 1) + " " + "Time: " + time);
+                System.out.println("Time: " + day.getTimeStamp().get(MAX - 1) + " " + "Temperature: " + day.getTemperature().get(MAX - 1) + " " + "Humidity: " + day.getHumidity().get(MAX - 1) + " " + "Time: " + time);
             } else {//丢包重发
+                Log.e("Tag", "数据错误Size: " + tmp.size());
                 reconnect(strURL, day);
             }
         } else {
-            RequestUtil.connectFailed();
+            Log.e("Tag", "没有数据");
+            reconnect(strURL, day);
         }
     }
 
@@ -128,10 +164,13 @@ public class RequestDayStep extends AsyncTask<String, Integer, String> {
     public void reconnect(String strURL, BeanTabMessage day) {
         int time = this.time + 1;
         if (time <= BeanConstant.MAXTIME) {
-            RequestDayStep another = new RequestDayStep(day, time + 1);
+            RequestDayStep another = new RequestDayStep(day, time);
             System.out.println("time: " + time);
             System.out.println(strURL);
             another.execute(strURL);
+        }
+        else {
+            RequestUtil.connectFailed();
         }
     }
 }

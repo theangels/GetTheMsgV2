@@ -12,6 +12,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:baselineAligned="false"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -45,7 +46,7 @@
                                 android:layout_height="match_parent"
                                 android:gravity="center"
                                 android:text="风向风速指针盘"
-                                android:textSize="16sp" />
+                                android:textSize="36sp" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -61,7 +62,7 @@
                                 android:layout_weight="1"
                                 android:gravity="center"
                                 android:text="温度"
-                                android:textSize="16sp" />
+                                android:textSize="36sp" />
 
                             <TextView
                                 android:id="@+id/currentHumidity"
@@ -70,7 +71,7 @@
                                 android:layout_weight="1"
                                 android:gravity="center"
                                 android:text="湿度"
-                                android:textSize="16sp" />
+                                android:textSize="36sp" />
                         </LinearLayout>
                     </LinearLayout>
 
@@ -87,7 +88,7 @@
                             android:layout_weight="1"
                             android:gravity="center"
                             android:text="气压"
-                            android:textSize="16sp" />
+                            android:textSize="36sp" />
 
                         <TextView
                             android:id="@+id/currentPM"
@@ -96,7 +97,7 @@
                             android:layout_weight="1"
                             android:gravity="center"
                             android:text="PM2.5"
-                            android:textSize="16sp" />
+                            android:textSize="36sp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -109,7 +110,7 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="10">
+                        android:layout_weight="12">
 
                         <ProgressBar
                             android:id="@+id/hourProgressBar"
@@ -190,7 +191,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="监控"
-                    android:textSize="16sp" />
+                    android:textSize="36sp" />
             </LinearLayout>
 
         </LinearLayout>
