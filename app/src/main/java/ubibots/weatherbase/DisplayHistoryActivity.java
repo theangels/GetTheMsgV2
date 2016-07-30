@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.WindowManager;
 
 import ubibots.weatherbase.ui.DisplayView;
+import ubibots.weatherbase.ui.MonitorView;
 
 public class DisplayHistoryActivity extends Activity {
 
@@ -30,5 +31,26 @@ public class DisplayHistoryActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         new DisplayView();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (MonitorView.getVideoView() != null)
+            MonitorView.getVideoView().pause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (MonitorView.getVideoView() != null)
+            MonitorView.getVideoView().resume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (MonitorView.getVideoView() != null)
+            MonitorView.getVideoView().stopPlayback();
     }
 }

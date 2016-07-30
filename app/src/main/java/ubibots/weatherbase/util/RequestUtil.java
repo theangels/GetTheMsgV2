@@ -1,6 +1,8 @@
 package ubibots.weatherbase.util;
 
 import android.graphics.Color;
+import android.nfc.Tag;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -16,9 +18,17 @@ import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanLineView;
 import ubibots.weatherbase.model.BeanTabMessage;
 import ubibots.weatherbase.ui.DisplayView;
+import ubibots.weatherbase.ui.MonitorView;
 
 public class RequestUtil {
     public static void flushView(BeanLineView lineView, BeanTabMessage tab, String xName) {
+        //停止监控
+        if (MonitorView.getVideoView() != null) {
+//            if(MonitorView.getVideoView().isPlaying()) {
+                MonitorView.getVideoView().pause();
+//            }
+        }
+
         //温度
         List<Line> temperatureLineList = new ArrayList<>();
         List<PointValue> temperatureValuesList;
@@ -90,18 +100,18 @@ public class RequestUtil {
 
         //最后显示点
         temperatureValuesList = new ArrayList<>();
-        float lastTemperature = tab.getTemperature().get(tab.getTemperature().size()-1).floatValue();
-        if(lastTemperature < BeanConstant.DOWNTEMP){
+        float lastTemperature = tab.getTemperature().get(tab.getTemperature().size() - 1).floatValue();
+        if (lastTemperature < BeanConstant.DOWNTEMP) {
             temperatureLine = new Line(temperatureValuesList).setColor(Color.BLUE).setCubic(true);
-        }else if(lastTemperature <= BeanConstant.UPTEMP){
+        } else if (lastTemperature <= BeanConstant.UPTEMP) {
             temperatureLine = new Line(temperatureValuesList).setColor(Color.GREEN).setCubic(true);
-        }else{
+        } else {
             temperatureLine = new Line(temperatureValuesList).setColor(Color.RED).setCubic(true);
         }
         temperatureLine.setHasPoints(true);
         temperatureLine.setHasLines(false);
         temperatureLine.setHasLabels(true);
-        temperatureValuesList.add(new PointValue(tab.getTemperature().size()-1,lastTemperature));
+        temperatureValuesList.add(new PointValue(tab.getTemperature().size() - 1, lastTemperature));
         temperatureLineList.add(temperatureLine);
 
         //上下空白
@@ -210,18 +220,18 @@ public class RequestUtil {
 
         //最后显示点
         humidityValuesList = new ArrayList<>();
-        float lastHumidity = tab.getHumidity().get(tab.getHumidity().size()-1).floatValue();
-        if(lastHumidity < BeanConstant.DOWNHUMI){
+        float lastHumidity = tab.getHumidity().get(tab.getHumidity().size() - 1).floatValue();
+        if (lastHumidity < BeanConstant.DOWNHUMI) {
             humidityLine = new Line(humidityValuesList).setColor(Color.BLUE).setCubic(true);
-        }else if(lastHumidity <= BeanConstant.UPHUMI){
+        } else if (lastHumidity <= BeanConstant.UPHUMI) {
             humidityLine = new Line(humidityValuesList).setColor(Color.GREEN).setCubic(true);
-        }else{
+        } else {
             humidityLine = new Line(humidityValuesList).setColor(Color.RED).setCubic(true);
         }
         humidityLine.setHasPoints(true);
         humidityLine.setHasLines(false);
         humidityLine.setHasLabels(true);
-        humidityValuesList.add(new PointValue(tab.getHumidity().size()-1,lastHumidity));
+        humidityValuesList.add(new PointValue(tab.getHumidity().size() - 1, lastHumidity));
         humidityLineList.add(humidityLine);
 
         //上下空白
@@ -326,18 +336,18 @@ public class RequestUtil {
 
         //最后显示点
         airValuesList = new ArrayList<>();
-        float lastAir = tab.getAir().get(tab.getAir().size()-1).floatValue();
-        if(lastAir < BeanConstant.DOWNAIR){
+        float lastAir = tab.getAir().get(tab.getAir().size() - 1).floatValue();
+        if (lastAir < BeanConstant.DOWNAIR) {
             airLine = new Line(airValuesList).setColor(Color.GREEN).setCubic(true);
-        }else if(lastAir <= BeanConstant.UPAIR){
+        } else if (lastAir <= BeanConstant.UPAIR) {
             airLine = new Line(airValuesList).setColor(Color.BLUE).setCubic(true);
-        }else{
+        } else {
             airLine = new Line(airValuesList).setColor(Color.RED).setCubic(true);
         }
         airLine.setHasPoints(true);
         airLine.setHasLines(false);
         airLine.setHasLabels(true);
-        airValuesList.add(new PointValue(tab.getAir().size()-1,lastAir));
+        airValuesList.add(new PointValue(tab.getAir().size() - 1, lastAir));
         airLineList.add(airLine);
 
         //上下空白
@@ -377,18 +387,26 @@ public class RequestUtil {
         axisY2.setMaxLabelChars(4);
         airData.setAxisYRight(axisY2);
         lineView.getAirView().setLineChartData(airData);
+
+        //开启监控
+        if (MonitorView.getVideoView() != null) {
+            Log.i("TAG", "StartMonitor");
+            MonitorView.getVideoView().start();
+        }
     }
 
-    public static void flushCurrentView(BeanTabMessage tab){
+    public static void flushCurrentView(BeanTabMessage tab) {
         String msg;
-        msg = "温度:"+tab.getTemperature().get(tab.getTemperature().size()-1) + "℃";
+        msg = "温度:" + tab.getTemperature().get(tab.getTemperature().size() - 1) + "℃";
         DisplayView.getCurrentView().getCurrentTemperature().setText(msg);
-        msg = "湿度:"+tab.getHumidity().get(tab.getHumidity().size()-1) + "%RH";
+        msg = "湿度:" + tab.getHumidity().get(tab.getHumidity().size() - 1) + "%RH";
         DisplayView.getCurrentView().getCurrentHumidity().setText(msg);
-        msg = "PM2.5:"+tab.getAir().get(tab.getAir().size()-1) + "μg/m3";
+        msg = "PM2.5:" + tab.getAir().get(tab.getAir().size() - 1) + "μg/m3";
         DisplayView.getCurrentView().getCurrentPM2_5().setText(msg);
-        msg = "气压:"+tab.getPressure().get(tab.getPressure().size()-1) + "KPa";
+        msg = "气压:" + tab.getPressure().get(tab.getPressure().size() - 1) + "hPa";
         DisplayView.getCurrentView().getCurrentAirPressure().setText(msg);
+        msg = "风速" + tab.getWindSpeed().get(tab.getWindSpeed().size()-1) + "mph";
+        DisplayView.getCurrentView().getCurrentWindSpeed().setText(msg);
     }
 
     public static void connectFailed() {

@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanTabMessage;
 import ubibots.weatherbase.ui.DayView;
+import ubibots.weatherbase.ui.MonitorView;
 import ubibots.weatherbase.util.DateUtil;
 import ubibots.weatherbase.util.RequestUtil;
 
@@ -145,6 +146,9 @@ public class RequestDayHistory extends AsyncTask<String, Integer, String> {
 
                     RequestDay.getRequestDayTimer().schedule(RequestDay.getRequestDayTask(), BeanConstant.delayDay, BeanConstant.delayDay);
                     DayView.getDayProgressBar().setVisibility(View.GONE);
+
+                    //开启监控
+                    new MonitorView();
                 }
                 DayView.getDayProgressBar().setProgress(100 * day.count / MAX);
                 System.out.println("Time: " + day.getTimeStamp().get(id) + " " + "Temperature: " + day.getTemperature().get(id) + " " + "Humidity: " + day.getHumidity().get(id) + " " + "Num: " + id + " " + "Count: " + day.count + " " + "Time: " + time);
@@ -178,6 +182,9 @@ public class RequestDayHistory extends AsyncTask<String, Integer, String> {
 
                 RequestDay.getRequestDayTimer().schedule(RequestDay.getRequestDayTask(), BeanConstant.delayDay, BeanConstant.delayDay);
                 DayView.getDayProgressBar().setVisibility(View.GONE);
+
+                //开启监控
+                new MonitorView();
             }
             DayView.getDayProgressBar().setProgress(100 * day.count / MAX);
             RequestUtil.connectFailed();

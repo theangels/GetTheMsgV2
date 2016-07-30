@@ -40,13 +40,24 @@
                             android:layout_weight="1"
                             android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/currentWind"
-                                android:layout_width="match_parent"
+                            <RelativeLayout
+                                android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:text="风向风速指针盘"
-                                android:textSize="36sp" />
+                                android:layout_gravity="center">
+
+                                <ubibots.weatherbase.util.CompassView
+                                    android:id="@+id/currentWind"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/currentWindSpeed"
+                                    android:layout_centerVertical="true"
+                                    android:layout_centerHorizontal="true"
+                                    android:textSize="32sp"/>
+                            </RelativeLayout>
                         </LinearLayout>
 
                         <LinearLayout
@@ -61,7 +72,6 @@
                                 android:layout_height="0dp"
                                 android:layout_weight="1"
                                 android:gravity="center"
-                                android:text="温度"
                                 android:textSize="36sp" />
 
                             <TextView
@@ -70,7 +80,6 @@
                                 android:layout_height="0dp"
                                 android:layout_weight="1"
                                 android:gravity="center"
-                                android:text="湿度"
                                 android:textSize="36sp" />
                         </LinearLayout>
                     </LinearLayout>
@@ -87,7 +96,6 @@
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:text="气压"
                             android:textSize="36sp" />
 
                         <TextView
@@ -96,7 +104,6 @@
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:text="PM2.5"
                             android:textSize="36sp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -185,13 +192,10 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/currentDisplay"
+                <ubibots.weatherbase.util.MyVideoView
+                    android:id="@+id/video"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="监控"
-                    android:textSize="36sp" />
+                    android:layout_height="match_parent" />
             </LinearLayout>
 
         </LinearLayout>
