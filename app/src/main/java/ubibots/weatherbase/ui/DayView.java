@@ -1,15 +1,10 @@
 package ubibots.weatherbase.ui;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ImageSpan;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -122,7 +117,6 @@ public class DayView {
             public void onPageScrollStateChanged(int arg0) {
             }
         });
-
         dayProgressBar = (ProgressBar)DisplayHistoryActivity.getActivity().findViewById(R.id.dayProgressBar);
     }
 
@@ -130,14 +124,12 @@ public class DayView {
      * 初始化底部的点
      */
     private void initDayDots() {
-        LinearLayout dayPointLayout = (LinearLayout) DisplayHistoryActivity.getActivity().findViewById(R.id.point);
-        dayDots = new TextView[dayViewList.size()];
-        for (int i = 0; i < dayViewList.size(); i++) {
-            dayDots[i] = (TextView) dayPointLayout.getChildAt(i);
-            setTextDrawable(dayDots[i], R.drawable.dian, i);
-        }
+        dayDots = new TextView[3];
+        dayDots[0] = (TextView)DisplayHistoryActivity.getActivity().findViewById(R.id.currentTemperature);
+        dayDots[1] = (TextView)DisplayHistoryActivity.getActivity().findViewById(R.id.currentHumidity);
+        dayDots[2] = (TextView)DisplayHistoryActivity.getActivity().findViewById(R.id.currentPM);
         dayCurrentIndex = 0;
-        setTextDrawable(dayDots[dayCurrentIndex], R.drawable.dian_down, dayCurrentIndex);
+        dayDots[0].setTextColor(Color.RED);
     }
 
 
@@ -149,23 +141,9 @@ public class DayView {
                 || dayCurrentIndex == position) {
             return;
         }
-        setTextDrawable(dayDots[position], R.drawable.dian_down, position);
-        setTextDrawable(dayDots[dayCurrentIndex], R.drawable.dian, dayCurrentIndex);
+        dayDots[dayCurrentIndex].setTextColor(Color.WHITE);
+        dayDots[position].setTextColor(Color.RED);
         dayCurrentIndex = position;
     }
 
-    private void setTextDrawable(TextView tv, int id, int index) {
-        Bitmap b = BitmapFactory.decodeResource(DisplayHistoryActivity.getActivity().getResources(), id);
-        ImageSpan imgSpan = new ImageSpan(DisplayHistoryActivity.getContext(), b);
-        SpannableString spanString = new SpannableString("icon");
-        spanString.setSpan(imgSpan, 0, 4, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        tv.setText(spanString);
-        if (index == 0) {
-            tv.append("温度");
-        } else if(index == 1){
-            tv.append("湿度");
-        }else if(index == 2){
-            tv.append("PM2.5");
-        }
-    }
 }

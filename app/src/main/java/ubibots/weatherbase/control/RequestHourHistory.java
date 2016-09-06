@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ubibots.weatherbase.model.BeanConstant;
+import ubibots.weatherbase.model.BeanFlag;
 import ubibots.weatherbase.model.BeanTabMessage;
 import ubibots.weatherbase.ui.HourView;
 import ubibots.weatherbase.util.DateUtil;
@@ -144,15 +145,17 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
                 //历史数据收集完毕
                 if (hour.count == MAX) {
                     //刷新界面
+                    BeanFlag.isFinishRoadHour = true;
+
                     RequestUtil.flushView(HourView.getHourBeanLineView(), hour, "时:分:秒");
                     RequestUtil.flushCurrentView(hour);
 
                     RequestHour.getRequestHourTimer().schedule(RequestHour.getRequestHourTask(), BeanConstant.delayHour, BeanConstant.delayHour);
                     HourView.getHourProgressBar().setVisibility(View.GONE);
+                    HourView.getHourViewPager().setVisibility(View.VISIBLE);
 
                     new RequestDay().executeRequest();
                 }
-                HourView.getHourProgressBar().setProgress(100 * hour.count / MAX);
                 System.out.println("Time: " + hour.getTimeStamp().get(id) + " " + "Temperature: " + hour.getTemperature().get(id) + " " + "Humidity: " + hour.getHumidity().get(id) + " " + "Num: " + id + " " + "Count: " + hour.count + " " + "Time: " + time);
             } else {//丢包重发
                 Log.e("Tag", "数据错误");
@@ -180,15 +183,17 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
             hour.count++;
             if (hour.count == MAX) {
                 //刷新界面
+                BeanFlag.isFinishRoadHour = true;
+
                 RequestUtil.flushView(HourView.getHourBeanLineView(), hour, "时:分:秒");
                 RequestUtil.flushCurrentView(hour);
 
                 RequestHour.getRequestHourTimer().schedule(RequestHour.getRequestHourTask(), BeanConstant.delayHour, BeanConstant.delayHour);
                 HourView.getHourProgressBar().setVisibility(View.GONE);
+                HourView.getHourViewPager().setVisibility(View.VISIBLE);
 
                 new RequestDay().executeRequest();
             }
-            HourView.getHourProgressBar().setProgress(100 * hour.count / MAX);
             RequestUtil.connectFailed();
         }
     }

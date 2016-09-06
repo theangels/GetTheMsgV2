@@ -12,11 +12,11 @@ import java.util.List;
 
 import ubibots.weatherbase.R;
 import ubibots.weatherbase.DisplayHistoryActivity;
+import ubibots.weatherbase.model.BeanFlag;
 
 public class ListTab {
     private int currentTab;
     private ListView listView;
-    private LinearLayout point;
 
     public int getCurrentTab() {
         return currentTab;
@@ -27,8 +27,6 @@ public class ListTab {
     }
 
     public ListTab() {
-        point = (LinearLayout)DisplayHistoryActivity.getActivity().findViewById(R.id.point);
-
         listView = (ListView) DisplayHistoryActivity.getActivity().findViewById(R.id.listview);
         listView.setBackgroundColor(Color.GRAY);
         listView.setCacheColorHint(0);
@@ -59,14 +57,13 @@ public class ListTab {
 
     private void hourVisible() {
         if (HourView.getHourViewPager() != null) {
-            HourView.getHourViewPager().setVisibility(View.VISIBLE);
+            if (BeanFlag.isFinishRoadHour) {
+                HourView.getHourViewPager().setVisibility(View.VISIBLE);
+            }
             dayInvisible();
         }
         if (HourView.getHourProgressBar().getVisibility() != View.GONE) {
             HourView.getHourProgressBar().setVisibility(View.VISIBLE);
-        }
-        if (point != null) {
-            point.setVisibility(View.VISIBLE);
         }
     }
 
@@ -81,15 +78,13 @@ public class ListTab {
 
     private void dayVisible() {
         if (DayView.getDayViewPager() != null) {
-            DayView.getDayViewPager().setVisibility(View.VISIBLE);
-            System.out.println("OK!");
+            if (BeanFlag.isFinishRoadDay) {
+                DayView.getDayViewPager().setVisibility(View.VISIBLE);
+            }
             hourInvisible();
         }
         if (DayView.getDayProgressBar().getVisibility() != View.GONE) {
             DayView.getDayProgressBar().setVisibility(View.VISIBLE);
-        }
-        if (point != null) {
-            point.setVisibility(View.VISIBLE);
         }
     }
 

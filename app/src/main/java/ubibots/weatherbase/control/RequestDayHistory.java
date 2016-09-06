@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ubibots.weatherbase.model.BeanConstant;
+import ubibots.weatherbase.model.BeanFlag;
 import ubibots.weatherbase.model.BeanTabMessage;
 import ubibots.weatherbase.ui.DayView;
 import ubibots.weatherbase.ui.MonitorView;
@@ -142,15 +143,17 @@ public class RequestDayHistory extends AsyncTask<String, Integer, String> {
                 //历史数据收集完毕
                 if (day.count == MAX) {
                     //刷新界面
+                    BeanFlag.isFinishRoadDay = true;
+
                     RequestUtil.flushView(DayView.getDayBeanLineView(), day, "日 时:分");
 
                     RequestDay.getRequestDayTimer().schedule(RequestDay.getRequestDayTask(), BeanConstant.delayDay, BeanConstant.delayDay);
                     DayView.getDayProgressBar().setVisibility(View.GONE);
+                    DayView.getDayViewPager().setVisibility(View.VISIBLE);
 
                     //开启监控
                     new MonitorView();
                 }
-                DayView.getDayProgressBar().setProgress(100 * day.count / MAX);
                 System.out.println("Time: " + day.getTimeStamp().get(id) + " " + "Temperature: " + day.getTemperature().get(id) + " " + "Humidity: " + day.getHumidity().get(id) + " " + "Num: " + id + " " + "Count: " + day.count + " " + "Time: " + time);
             } else {//丢包重发
                 Log.e("Tag", "数据错误Size: " + tmp.size());
@@ -178,15 +181,17 @@ public class RequestDayHistory extends AsyncTask<String, Integer, String> {
             day.count++;
             if (day.count == MAX) {
                 //刷新界面
+                BeanFlag.isFinishRoadDay = true;
+
                 RequestUtil.flushView(DayView.getDayBeanLineView(), day, "日 时:分");
 
                 RequestDay.getRequestDayTimer().schedule(RequestDay.getRequestDayTask(), BeanConstant.delayDay, BeanConstant.delayDay);
                 DayView.getDayProgressBar().setVisibility(View.GONE);
+                DayView.getDayViewPager().setVisibility(View.VISIBLE);
 
                 //开启监控
                 new MonitorView();
             }
-            DayView.getDayProgressBar().setProgress(100 * day.count / MAX);
             RequestUtil.connectFailed();
         }
     }

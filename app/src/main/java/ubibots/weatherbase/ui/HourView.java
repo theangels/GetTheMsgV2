@@ -1,15 +1,10 @@
 package ubibots.weatherbase.ui;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ImageSpan;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -122,7 +117,6 @@ public class HourView {
             public void onPageScrollStateChanged(int arg0) {
             }
         });
-
         hourProgressBar = (ProgressBar)DisplayHistoryActivity.getActivity().findViewById(R.id.hourProgressBar);
     }
 
@@ -130,16 +124,13 @@ public class HourView {
      * 初始化底部的点
      */
     private void initHourDots() {
-        LinearLayout hourPointLayout = (LinearLayout) DisplayHistoryActivity.getActivity().findViewById(R.id.point);
-        hourDots = new TextView[hourViewList.size()];
-        for (int i = 0; i < hourViewList.size(); i++) {
-            hourDots[i] = (TextView) hourPointLayout.getChildAt(i);
-            setTextDrawable(hourDots[i], R.drawable.dian, i);
-        }
+        hourDots = new TextView[3];
+        hourDots[0] = (TextView)DisplayHistoryActivity.getActivity().findViewById(R.id.currentTemperature);
+        hourDots[1] = (TextView)DisplayHistoryActivity.getActivity().findViewById(R.id.currentHumidity);
+        hourDots[2] = (TextView)DisplayHistoryActivity.getActivity().findViewById(R.id.currentPM);
         hourCurrentIndex = 0;
-        setTextDrawable(hourDots[hourCurrentIndex], R.drawable.dian_down, hourCurrentIndex);
+        hourDots[0].setTextColor(Color.RED);
     }
-
 
     /**
      * 当滚动的时候更换点的背景图
@@ -149,24 +140,9 @@ public class HourView {
                 || hourCurrentIndex == position) {
             return;
         }
-        setTextDrawable(hourDots[position], R.drawable.dian_down, position);
-        setTextDrawable(hourDots[hourCurrentIndex], R.drawable.dian, hourCurrentIndex);
+
+        hourDots[hourCurrentIndex].setTextColor(Color.WHITE);
+        hourDots[position].setTextColor(Color.RED);
         hourCurrentIndex = position;
     }
-
-    private void setTextDrawable(TextView tv, int id, int index) {
-        Bitmap b = BitmapFactory.decodeResource(DisplayHistoryActivity.getActivity().getResources(), id);
-        ImageSpan imgSpan = new ImageSpan(DisplayHistoryActivity.getContext(), b);
-        SpannableString spanString = new SpannableString("icon");
-        spanString.setSpan(imgSpan, 0, 4, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        tv.setText(spanString);
-        if (index == 0) {
-            tv.append("温度");
-        } else if(index == 1){
-            tv.append("湿度");
-        }else if(index == 2){
-            tv.append("PM2.5");
-        }
-    }
-
 }

@@ -24,9 +24,7 @@ public class RequestUtil {
     public static void flushView(BeanLineView lineView, BeanTabMessage tab, String xName) {
         //停止监控
         if (MonitorView.getVideoView() != null) {
-//            if(MonitorView.getVideoView().isPlaying()) {
-                MonitorView.getVideoView().pause();
-//            }
+            MonitorView.getVideoView().pause();
         }
 
         //温度
@@ -397,20 +395,22 @@ public class RequestUtil {
 
     public static void flushCurrentView(BeanTabMessage tab) {
         String msg;
-        msg = "温度:" + tab.getTemperature().get(tab.getTemperature().size() - 1) + "℃";
+        msg = tab.getTemperature().get(tab.getTemperature().size() - 1) + " ℃";
         DisplayView.getCurrentView().getCurrentTemperature().setText(msg);
-        msg = "湿度:" + tab.getHumidity().get(tab.getHumidity().size() - 1) + "%RH";
+        msg = tab.getHumidity().get(tab.getHumidity().size() - 1) + " %RH";
         DisplayView.getCurrentView().getCurrentHumidity().setText(msg);
-        msg = "PM2.5:" + tab.getAir().get(tab.getAir().size() - 1) + "μg/m3";
+        msg = tab.getAir().get(tab.getAir().size() - 1) + " μg/m3";
         DisplayView.getCurrentView().getCurrentPM2_5().setText(msg);
-        msg = "气压:" + tab.getPressure().get(tab.getPressure().size() - 1) + "hPa";
+        msg = tab.getPressure().get(tab.getPressure().size() - 1) + " hPa";
         DisplayView.getCurrentView().getCurrentAirPressure().setText(msg);
-        msg = "风速" + tab.getWindSpeed().get(tab.getWindSpeed().size()-1) + "mph";
+        msg = tab.getWindSpeed().get(tab.getWindSpeed().size() - 1) + " mph";
         DisplayView.getCurrentView().getCurrentWindSpeed().setText(msg);
+        msg = "" + tab.getWindDirection().get(tab.getWindDirection().size() - 1);
+        DisplayView.getCurrentView().getCurrentWindDirection().setText(msg);
     }
 
     public static void connectFailed() {
-        Toast.makeText(DisplayHistoryActivity.getContext(), "获取数据失败，可能该时间段不存在数据",
+        Toast.makeText(DisplayHistoryActivity.getContext(), "获取数据失败，可能该时间段不存在数据或者网络连接中断!",
                 Toast.LENGTH_SHORT).show();
     }
 }
