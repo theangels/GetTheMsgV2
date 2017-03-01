@@ -1,23 +1,29 @@
 package ubibots.weatherbase.ui;
 
+import android.app.Activity;
 import android.net.Uri;
 import android.util.Log;
 
-import ubibots.weatherbase.DisplayHistoryActivity;
 import ubibots.weatherbase.R;
-import ubibots.weatherbase.util.MyVideoView;
+import ubibots.weatherbase.model.MyVideoView;
+import ubibots.weatherbase.util.ContextUtil;
 
 public class MonitorView {
 
-    private static MyVideoView videoView;
+    public static MonitorView thisClass;
 
-    public static MyVideoView getVideoView() {
+    private MyVideoView videoView;
+
+    public MyVideoView getVideoView() {
         return videoView;
     }
 
-    public MonitorView(){
-        videoView = (MyVideoView) DisplayHistoryActivity.getActivity().findViewById(R.id.video);
-        videoView.setVideoURI(Uri.parse("rtsp://admin:ZUCCli511@192.168.0.64:554/h264/ch1/sub"));
+    MonitorView(Activity activity){
+        thisClass = this;
+
+        videoView = (MyVideoView) activity.findViewById(R.id.video);
+        String url = ContextUtil.getInstance().getString(R.string.url_monitor);
+        videoView.setVideoURI(Uri.parse(url));
         videoView.requestFocus();
         Log.i("Tag","Start!");
     }

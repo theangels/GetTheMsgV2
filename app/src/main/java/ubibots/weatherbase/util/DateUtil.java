@@ -5,7 +5,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class DateUtil {
-    public static String UTCDateFormat(Calendar calendar) {
+    static String UTCDateFormat(Calendar calendar) {
         String UTCDate;
         SimpleDateFormat sdf;
         Calendar tmp = (Calendar) calendar.clone();

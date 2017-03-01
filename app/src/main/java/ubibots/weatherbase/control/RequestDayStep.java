@@ -20,13 +20,16 @@ import ubibots.weatherbase.ui.DayView;
 import ubibots.weatherbase.util.DateUtil;
 import ubibots.weatherbase.util.RequestUtil;
 
-public class RequestDayStep extends AsyncTask<String, Integer, String> {
-    public final static int MAX = 48;
+class RequestDayStep extends AsyncTask<String, Integer, String> {
+
+    private final static int MAX = 48;
     private BeanTabMessage day;
     private String strURL;
     private int time;
+    private DayView dayView;
 
-    public RequestDayStep(BeanTabMessage day, int time) {
+    RequestDayStep(DayView dayView, BeanTabMessage day, int time) {
+        this.dayView = dayView;
         this.day = day;
         this.time = time;
     }
@@ -81,37 +84,37 @@ public class RequestDayStep extends AsyncTask<String, Integer, String> {
                 }
                 String rainFallString = tmp.get(1);
                 double r = 0;
-                if(!rainFallString.equals("---")){
+                if (!rainFallString.equals("---")) {
                     r = Double.valueOf(rainFallString);
                 }
                 String humidityString = tmp.get(2);
                 double h = 0;
-                if(!humidityString.equals("---")){
+                if (!humidityString.equals("---")) {
                     h = Double.valueOf(humidityString);
                 }
                 String windSpeedString = tmp.get(3);
                 double s = 0;
-                if(!windSpeedString.equals("---")){
+                if (!windSpeedString.equals("---")) {
                     s = Double.valueOf(windSpeedString);
                 }
                 String airString = tmp.get(4);
                 double a = 0;
-                if(!airString.equals("---")){
+                if (!airString.equals("---")) {
                     a = Double.valueOf(airString);
                 }
                 String windDirectionString = tmp.get(5);
                 double d = 0;
-                if(!windDirectionString.equals("---")){
+                if (!windDirectionString.equals("---")) {
                     d = Double.valueOf(windDirectionString);
                 }
                 String pressureString = tmp.get(6);
                 double p = 0;
-                if(!pressureString.equals("---")){
+                if (!pressureString.equals("---")) {
                     p = Double.valueOf(pressureString);
                 }
                 String timeStampString = tmp.get(7);
-                timeStampString = timeStampString.replace("&#x3a;",":");
-                timeStampString = timeStampString.replace("&#x2b;","+");
+                timeStampString = timeStampString.replace("&#x3a;", ":");
+                timeStampString = timeStampString.replace("&#x2b;", "+");
 
                 //丢包重发
                 if (t < 0 || r < 0 || h < 0 || s < 0 || a < 0 || d < 0 || p < 0 || timeStampString.length() != 29) {
@@ -143,7 +146,7 @@ public class RequestDayStep extends AsyncTask<String, Integer, String> {
                 day.getTimeStamp().add(timeStampString);
 
                 //刷新界面
-                RequestUtil.flushView(DayView.getDayBeanLineView(), day, "日 时:分");
+                dayView.flushView(dayView.getDayBeanLineView(), day);
 
                 System.out.println("Time: " + day.getTimeStamp().get(MAX - 1) + " " + "Temperature: " + day.getTemperature().get(MAX - 1) + " " + "Humidity: " + day.getHumidity().get(MAX - 1) + " " + "Time: " + time);
             } else {//丢包重发
@@ -161,15 +164,14 @@ public class RequestDayStep extends AsyncTask<String, Integer, String> {
     protected void onPreExecute() {
     }
 
-    public void reconnect(String strURL, BeanTabMessage day) {
+    private void reconnect(String strURL, BeanTabMessage day) {
         int time = this.time + 1;
         if (time <= BeanConstant.MAXTIME) {
-            RequestDayStep another = new RequestDayStep(day, time);
+            RequestDayStep another = new RequestDayStep(dayView, day, time);
             System.out.println("time: " + time);
             System.out.println(strURL);
             another.execute(strURL);
-        }
-        else {
+        } else {
             RequestUtil.connectFailed();
         }
     }

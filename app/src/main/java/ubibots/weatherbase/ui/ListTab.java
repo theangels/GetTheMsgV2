@@ -1,39 +1,48 @@
 package ubibots.weatherbase.ui;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ubibots.weatherbase.R;
-import ubibots.weatherbase.DisplayHistoryActivity;
 import ubibots.weatherbase.model.BeanFlag;
+import ubibots.weatherbase.util.ContextUtil;
 
 public class ListTab {
+
+    public static ListTab thisClass;
+
+    private static ListView listView;
     private int currentTab;
-    private ListView listView;
+    private HourView hourView;
+    private DayView dayView;
 
     public int getCurrentTab() {
         return currentTab;
     }
 
-    public ListView getListView() {
+    public static ListView getListView() {
         return listView;
     }
 
-    public ListTab() {
-        listView = (ListView) DisplayHistoryActivity.getActivity().findViewById(R.id.listview);
+    ListTab(Activity activity, HourView hourView, DayView dayView) {
+        thisClass = this;
+        this.hourView = hourView;
+        this.dayView = dayView;
+
+        listView = (ListView) activity.findViewById(R.id.listview);
         listView.setBackgroundColor(Color.GRAY);
         listView.setCacheColorHint(0);
         final List<String> data = new ArrayList<>();
         data.add("每时");
         data.add("每日");
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(DisplayHistoryActivity.getActivity(), android.R.layout.simple_expandable_list_item_1, data);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(ContextUtil.getInstance(), android.R.layout.simple_expandable_list_item_1, data);
         listView.setAdapter(arrayAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -55,44 +64,44 @@ public class ListTab {
         currentTab = 0;
     }
 
-    private void hourVisible() {
-        if (HourView.getHourViewPager() != null) {
+    public void hourVisible() {
+        if (hourView.getHourViewPager() != null) {
             if (BeanFlag.isFinishRoadHour) {
-                HourView.getHourViewPager().setVisibility(View.VISIBLE);
+                hourView.getHourViewPager().setVisibility(View.VISIBLE);
             }
             dayInvisible();
         }
-        if (HourView.getHourProgressBar().getVisibility() != View.GONE) {
-            HourView.getHourProgressBar().setVisibility(View.VISIBLE);
+        if (hourView.getHourProgressBar().getVisibility() != View.GONE) {
+            hourView.getHourProgressBar().setVisibility(View.VISIBLE);
         }
     }
 
     private void hourInvisible() {
-        if (HourView.getHourViewPager() != null) {
-            HourView.getHourViewPager().setVisibility(View.INVISIBLE);
-            if (HourView.getHourProgressBar().getVisibility() != View.GONE) {
-                HourView.getHourProgressBar().setVisibility(View.INVISIBLE);
+        if (hourView.getHourViewPager() != null) {
+            hourView.getHourViewPager().setVisibility(View.INVISIBLE);
+            if (hourView.getHourProgressBar().getVisibility() != View.GONE) {
+                hourView.getHourProgressBar().setVisibility(View.INVISIBLE);
             }
         }
     }
 
     private void dayVisible() {
-        if (DayView.getDayViewPager() != null) {
+        if (dayView.getDayViewPager() != null) {
             if (BeanFlag.isFinishRoadDay) {
-                DayView.getDayViewPager().setVisibility(View.VISIBLE);
+                dayView.getDayViewPager().setVisibility(View.VISIBLE);
             }
             hourInvisible();
         }
-        if (DayView.getDayProgressBar().getVisibility() != View.GONE) {
-            DayView.getDayProgressBar().setVisibility(View.VISIBLE);
+        if (dayView.getDayProgressBar().getVisibility() != View.GONE) {
+            dayView.getDayProgressBar().setVisibility(View.VISIBLE);
         }
     }
 
     private void dayInvisible() {
-        if (DayView.getDayViewPager() != null) {
-            DayView.getDayViewPager().setVisibility(View.INVISIBLE);
-            if (DayView.getDayProgressBar().getVisibility() != View.GONE) {
-                DayView.getDayProgressBar().setVisibility(View.INVISIBLE);
+        if (dayView.getDayViewPager() != null) {
+            dayView.getDayViewPager().setVisibility(View.INVISIBLE);
+            if (dayView.getDayProgressBar().getVisibility() != View.GONE) {
+                dayView.getDayProgressBar().setVisibility(View.INVISIBLE);
             }
         }
     }

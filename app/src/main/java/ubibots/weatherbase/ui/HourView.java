@@ -1,5 +1,6 @@
 package ubibots.weatherbase.ui;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -15,55 +16,55 @@ import lecho.lib.hellocharts.gesture.ContainerScrollType;
 import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.view.LineChartView;
 import ubibots.weatherbase.R;
-import ubibots.weatherbase.DisplayHistoryActivity;
+import ubibots.weatherbase.model.BeanCurrentView;
 import ubibots.weatherbase.model.BeanLineView;
 import ubibots.weatherbase.model.BeanTabMessage;
+import ubibots.weatherbase.util.ContextUtil;
+import ubibots.weatherbase.util.RequestUtil;
 
 public class HourView {
-    private static BeanLineView hourBeanLineView;
-    private static BeanTabMessage hour;
-    private static List<View> hourViewList;
-    private static TextView[] hourDots;
-    private static int hourCurrentIndex;
-    private static ViewPager hourViewPager;
-    private static ProgressBar hourProgressBar;
+    public BeanTabMessage hour;
 
-    public static BeanLineView getHourBeanLineView() {
+    private BeanLineView hourBeanLineView;
+    private List<View> hourViewList;
+    private TextView[] hourDots;
+    private int hourCurrentIndex;
+    private ViewPager hourViewPager;
+    private ProgressBar hourProgressBar;
+    private Activity activity;
+    private BeanCurrentView currentView;
+
+    public BeanLineView getHourBeanLineView() {
         return hourBeanLineView;
     }
 
-    public static ViewPager getHourViewPager() {
+    public ViewPager getHourViewPager() {
         return hourViewPager;
     }
 
-    public static ProgressBar getHourProgressBar() {
+    public ProgressBar getHourProgressBar() {
         return hourProgressBar;
     }
 
-    public static BeanTabMessage getHour() {
-        return hour;
-    }
+    HourView(Activity activity, BeanCurrentView currentView) {
+        this.activity = activity;
+        this.currentView = currentView;
 
-    public static void setHour(BeanTabMessage hour) {
-        HourView.hour = hour;
-    }
-
-    public HourView() {
-        hourViewPager = (ViewPager) DisplayHistoryActivity.getActivity().findViewById(R.id.hourView);
+        hourViewPager = (ViewPager) activity.findViewById(R.id.hourView);
         hourViewList = new ArrayList<>();
-        View view1 = View.inflate(DisplayHistoryActivity.getContext(), R.layout.temperaturehour, null);
+        View view1 = View.inflate(ContextUtil.getInstance(), R.layout.temperaturehour, null);
         LineChartView temperatureHourView = (LineChartView) view1.findViewById(R.id.temperaturehour);
         temperatureHourView.setInteractive(false);
         temperatureHourView.setZoomType(ZoomType.HORIZONTAL);
         temperatureHourView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
         temperatureHourView.setVisibility(View.VISIBLE);
-        View view2 = View.inflate(DisplayHistoryActivity.getContext(), R.layout.humidityhour, null);
+        View view2 = View.inflate(ContextUtil.getInstance(), R.layout.humidityhour, null);
         LineChartView humidityHourView = (LineChartView) view2.findViewById(R.id.humidityhour);
         humidityHourView.setInteractive(false);
         humidityHourView.setZoomType(ZoomType.HORIZONTAL);
         humidityHourView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
         humidityHourView.setVisibility(View.VISIBLE);
-        View view3 = View.inflate(DisplayHistoryActivity.getContext(), R.layout.airhour, null);
+        View view3 = View.inflate(ContextUtil.getInstance(), R.layout.airhour, null);
         LineChartView airHourView = (LineChartView) view3.findViewById(R.id.airhour);
         airHourView.setInteractive(false);
         airHourView.setZoomType(ZoomType.HORIZONTAL);
@@ -117,7 +118,7 @@ public class HourView {
             public void onPageScrollStateChanged(int arg0) {
             }
         });
-        hourProgressBar = (ProgressBar)DisplayHistoryActivity.getActivity().findViewById(R.id.hourProgressBar);
+        hourProgressBar = (ProgressBar) activity.findViewById(R.id.hourProgressBar);
     }
 
     /**
@@ -125,9 +126,9 @@ public class HourView {
      */
     private void initHourDots() {
         hourDots = new TextView[3];
-        hourDots[0] = (TextView)DisplayHistoryActivity.getActivity().findViewById(R.id.currentTemperature);
-        hourDots[1] = (TextView)DisplayHistoryActivity.getActivity().findViewById(R.id.currentHumidity);
-        hourDots[2] = (TextView)DisplayHistoryActivity.getActivity().findViewById(R.id.currentPM);
+        hourDots[0] = (TextView) activity.findViewById(R.id.currentTemperature);
+        hourDots[1] = (TextView) activity.findViewById(R.id.currentHumidity);
+        hourDots[2] = (TextView) activity.findViewById(R.id.currentPM);
         hourCurrentIndex = 0;
         hourDots[0].setTextColor(Color.RED);
     }
@@ -144,5 +145,25 @@ public class HourView {
         hourDots[hourCurrentIndex].setTextColor(Color.WHITE);
         hourDots[position].setTextColor(Color.RED);
         hourCurrentIndex = position;
+    }
+
+    public void flushView(BeanLineView lineView, BeanTabMessage tab) {
+        RequestUtil.flushView(lineView, tab, "时:分:秒");
+    }
+
+    public void flushCurrentView(BeanTabMessage tab) {
+        String msg;
+        msg = tab.getTemperature().get(tab.getTemperature().size() - 1) + " ℃";
+        currentView.getCurrentTemperature().setText(msg);
+        msg = tab.getHumidity().get(tab.getHumidity().size() - 1) + " %RH";
+        currentView.getCurrentHumidity().setText(msg);
+        msg = tab.getAir().get(tab.getAir().size() - 1) + " μg/m3";
+        currentView.getCurrentPM2_5().setText(msg);
+        msg = tab.getPressure().get(tab.getPressure().size() - 1) + " hPa";
+        currentView.getCurrentAirPressure().setText(msg);
+        msg = tab.getWindSpeed().get(tab.getWindSpeed().size() - 1) + " mph";
+        currentView.getCurrentWindSpeed().setText(msg);
+        msg = "" + tab.getWindDirection().get(tab.getWindDirection().size() - 1);
+        currentView.getCurrentWindDirection().setText(msg);
     }
 }

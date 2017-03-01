@@ -20,15 +20,19 @@ import ubibots.weatherbase.ui.HourView;
 import ubibots.weatherbase.util.DateUtil;
 import ubibots.weatherbase.util.RequestUtil;
 
-public class RequestHourStep extends AsyncTask<String, Integer, String> {
-    public final static int MAX = 120;
+class RequestHourStep extends AsyncTask<String, Integer, String> {
+
+    private final static int MAX = 120;
     private BeanTabMessage hour;
     private String strURL;
     private int time;
+    private HourView hourView;
 
-    public RequestHourStep(BeanTabMessage hour, int time) {
+    RequestHourStep(HourView hourView, BeanTabMessage hour, int time) {
+        this.hourView = hourView;
         this.hour = hour;
         this.time = time;
+
     }
 
     //该方法并不运行在UI线程当中，主要用于异步操作，所有在该方法中不能对UI当中的空间进行设置和修改
@@ -81,37 +85,37 @@ public class RequestHourStep extends AsyncTask<String, Integer, String> {
                 }
                 String rainFallString = tmp.get(1);
                 double r = 0;
-                if(!rainFallString.equals("---")){
+                if (!rainFallString.equals("---")) {
                     r = Double.valueOf(rainFallString);
                 }
                 String humidityString = tmp.get(2);
                 double h = 0;
-                if(!humidityString.equals("---")){
+                if (!humidityString.equals("---")) {
                     h = Double.valueOf(humidityString);
                 }
                 String windSpeedString = tmp.get(3);
                 double s = 0;
-                if(!windSpeedString.equals("---")){
+                if (!windSpeedString.equals("---")) {
                     s = Double.valueOf(windSpeedString);
                 }
                 String airString = tmp.get(4);
                 double a = 0;
-                if(!airString.equals("---")){
+                if (!airString.equals("---")) {
                     a = Double.valueOf(airString);
                 }
                 String windDirectionString = tmp.get(5);
                 double d = 0;
-                if(!windDirectionString.equals("---")){
+                if (!windDirectionString.equals("---")) {
                     d = Double.valueOf(windDirectionString);
                 }
                 String pressureString = tmp.get(6);
                 double p = 0;
-                if(!pressureString.equals("---")){
+                if (!pressureString.equals("---")) {
                     p = Double.valueOf(pressureString);
                 }
                 String timeStampString = tmp.get(7);
-                timeStampString = timeStampString.replace("&#x3a;",":");
-                timeStampString = timeStampString.replace("&#x2b;","+");
+                timeStampString = timeStampString.replace("&#x3a;", ":");
+                timeStampString = timeStampString.replace("&#x2b;", "+");
 
                 //丢包重发
                 if (t < 0 || r < 0 || h < 0 || s < 0 || a < 0 || d < 0 || p < 0 || timeStampString.length() != 29) {
@@ -143,8 +147,8 @@ public class RequestHourStep extends AsyncTask<String, Integer, String> {
                 hour.getTimeStamp().add(timeStampString);
 
                 //刷新界面
-                RequestUtil.flushView(HourView.getHourBeanLineView(), hour, "时:分:秒");
-                RequestUtil.flushCurrentView(hour);
+                hourView.flushView(hourView.getHourBeanLineView(), hour);
+                hourView.flushCurrentView(hour);
 
                 System.out.println("Time: " + hour.getTimeStamp().get(MAX - 1) + " " + "Temperature: " + hour.getTemperature().get(MAX - 1) + " " + "Humidity: " + hour.getHumidity().get(MAX - 1) + " " + "Time: " + time);
             } else {//丢包重发
@@ -161,14 +165,14 @@ public class RequestHourStep extends AsyncTask<String, Integer, String> {
     protected void onPreExecute() {
     }
 
-    public void reconnect(String strURL, BeanTabMessage hour) {
+    private void reconnect(String strURL, BeanTabMessage hour) {
         int time = this.time + 1;
         if (time <= BeanConstant.MAXTIME) {
-            RequestHourStep another = new RequestHourStep(hour, time);
+            RequestHourStep another = new RequestHourStep(hourView, hour, time);
             System.out.println("time: " + time);
             System.out.println(strURL);
             another.execute(strURL);
-        }else {
+        } else {
             RequestUtil.connectFailed();
         }
     }

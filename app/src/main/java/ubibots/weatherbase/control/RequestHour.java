@@ -10,44 +10,49 @@ import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import ubibots.weatherbase.DisplayHistoryActivity;
 import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanTabMessage;
+import ubibots.weatherbase.ui.DayView;
 import ubibots.weatherbase.ui.HourView;
-import ubibots.weatherbase.util.RequestUtil;
+import ubibots.weatherbase.util.ContextUtil;
 import ubibots.weatherbase.util.URLUtil;
 
 public class RequestHour {
-    private static RequestHourHandler requestHourHandler;
 
-    public RequestHour() {
+    private static RequestHourHandler requestHourHandler;
+    private static HourView hourView;
+    private static DayView dayView;
+
+    public RequestHour(HourView hourView, DayView dayView) {
+        RequestHour.hourView = hourView;
+        RequestHour.dayView = dayView;
         requestHourHandler = new RequestHourHandler();
     }
 
     public void executeRequest() {
-        HourView.setHour(new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>()));
+        hourView.hour = new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>());
         Calendar hourCalendar = Calendar.getInstance();
         hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) - BeanConstant.delayHour / 1000 * (RequestHourHistory.MAX - 1));
         for (int i = 0; i < RequestHourHistory.MAX; i++) {
-            HourView.getHour().getTemperature().add(0.0);
-            HourView.getHour().getRainFall().add(0.0);
-            HourView.getHour().getHumidity().add(0.0);
-            HourView.getHour().getWindSpeed().add(0.0);
-            HourView.getHour().getAir().add(0.0);
-            HourView.getHour().getWindDirection().add(0.0);
-            HourView.getHour().getPressure().add(0.0);
-            HourView.getHour().getTimeStamp().add("");
-            hourHistory(HourView.getHour(), hourCalendar, i);
+            hourView.hour.getTemperature().add(0.0);
+            hourView.hour.getRainFall().add(0.0);
+            hourView.hour.getHumidity().add(0.0);
+            hourView.hour.getWindSpeed().add(0.0);
+            hourView.hour.getAir().add(0.0);
+            hourView.hour.getWindDirection().add(0.0);
+            hourView.hour.getPressure().add(0.0);
+            hourView.hour.getTimeStamp().add("");
+            hourHistory(hourView.hour, hourCalendar, i);
             hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) + BeanConstant.delayHour / 1000);
         }
 
-        Toast.makeText(DisplayHistoryActivity.getContext(), "正在获取数据中,请耐心等待...",
+        Toast.makeText(ContextUtil.getInstance(), "正在获取数据中,请耐心等待...",
                 Toast.LENGTH_LONG).show();
     }
 
-    public static void hourHistory(BeanTabMessage hour, Calendar calendar, int id) {
+    private void hourHistory(BeanTabMessage hour, Calendar calendar, int id) {
         String strUrl = URLUtil.combineUrl((Calendar) calendar.clone());
-        RequestHourHistory request = new RequestHourHistory(hour, id, 0);
+        RequestHourHistory request = new RequestHourHistory(hourView, dayView, hour, id, 0);
         request.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, strUrl);
     }
 
@@ -62,27 +67,28 @@ public class RequestHour {
         }
     };
 
-    public static Timer getRequestHourTimer() {
+    static Timer getRequestHourTimer() {
         return requestHourTimer;
     }
 
-    public static TimerTask getRequestHourTask() {
+    static TimerTask getRequestHourTask() {
         return requestHourTask;
     }
 
-    static class RequestHourHandler extends Handler {
+    private static class RequestHourHandler extends Handler {
+
         public void handleMessage(Message msg) {
             if (msg.what == 1) {
                 Calendar calendar = Calendar.getInstance();
-                hourStep(HourView.getHour(), calendar);
+                hourStep(hourView.hour, calendar);
             }
             super.handleMessage(msg);
         }
     }
 
-    public static void hourStep(BeanTabMessage hour, Calendar calendar) {
+    private static void hourStep(BeanTabMessage hour, Calendar calendar) {
         String strUrl = URLUtil.combineUrl((Calendar) calendar.clone());
-        RequestHourStep request = new RequestHourStep(hour, 0);
+        RequestHourStep request = new RequestHourStep(hourView, hour, 0);
         request.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, strUrl);
     }
 }

@@ -1,5 +1,6 @@
 package ubibots.weatherbase.ui;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -15,55 +16,52 @@ import lecho.lib.hellocharts.gesture.ContainerScrollType;
 import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.view.LineChartView;
 import ubibots.weatherbase.R;
-import ubibots.weatherbase.DisplayHistoryActivity;
 import ubibots.weatherbase.model.BeanLineView;
 import ubibots.weatherbase.model.BeanTabMessage;
+import ubibots.weatherbase.util.ContextUtil;
+import ubibots.weatherbase.util.RequestUtil;
 
 public class DayView {
-    private static BeanLineView dayBeanLineView;
-    private static BeanTabMessage day;
-    private static List<View> dayViewList;
-    private static TextView[] dayDots;
-    private static int dayCurrentIndex;
-    private static ViewPager dayViewPager;
-    private static ProgressBar dayProgressBar;
+    public BeanTabMessage day;
 
-    public static BeanLineView getDayBeanLineView() {
+    private BeanLineView dayBeanLineView;
+    private List<View> dayViewList;
+    private TextView[] dayDots;
+    private int dayCurrentIndex;
+    private ViewPager dayViewPager;
+    private ProgressBar dayProgressBar;
+    private Activity activity;
+
+    public BeanLineView getDayBeanLineView() {
         return dayBeanLineView;
     }
 
-    public static ViewPager getDayViewPager() {
+    public ViewPager getDayViewPager() {
         return dayViewPager;
     }
 
-    public static ProgressBar getDayProgressBar() {
+    public ProgressBar getDayProgressBar() {
         return dayProgressBar;
     }
 
-    public static BeanTabMessage getDay() {
-        return day;
-    }
+    DayView(Activity activity) {
+        this.activity = activity;
 
-    public static void setDay(BeanTabMessage day) {
-        DayView.day = day;
-    }
-
-    public DayView() {
-        dayViewPager = (ViewPager) DisplayHistoryActivity.getActivity().findViewById(R.id.dayView);
+        dayViewPager = (ViewPager) activity.findViewById(R.id.dayView);
         dayViewList = new ArrayList<>();
-        View view1 = View.inflate(DisplayHistoryActivity.getContext(), R.layout.temperatureday, null);
+        View view1 = View.inflate(ContextUtil.getInstance(), R.layout.temperatureday, null);
         LineChartView temperatureDayView = (LineChartView) view1.findViewById(R.id.temperatureday);
         temperatureDayView.setInteractive(false);
         temperatureDayView.setZoomType(ZoomType.HORIZONTAL);
         temperatureDayView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
         temperatureDayView.setVisibility(View.VISIBLE);
-        View view2 = View.inflate(DisplayHistoryActivity.getContext(), R.layout.humidityday, null);
+        View view2 = View.inflate(ContextUtil.getInstance(), R.layout.humidityday, null);
         LineChartView humidityDayView = (LineChartView) view2.findViewById(R.id.humidityday);
         humidityDayView.setInteractive(false);
         humidityDayView.setZoomType(ZoomType.HORIZONTAL);
         humidityDayView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
         humidityDayView.setVisibility(View.VISIBLE);
-        View view3 = View.inflate(DisplayHistoryActivity.getContext(), R.layout.airday, null);
+        View view3 = View.inflate(ContextUtil.getInstance(), R.layout.airday, null);
         LineChartView airDayView = (LineChartView) view3.findViewById(R.id.airday);
         airDayView.setInteractive(false);
         airDayView.setZoomType(ZoomType.HORIZONTAL);
@@ -117,7 +115,7 @@ public class DayView {
             public void onPageScrollStateChanged(int arg0) {
             }
         });
-        dayProgressBar = (ProgressBar)DisplayHistoryActivity.getActivity().findViewById(R.id.dayProgressBar);
+        dayProgressBar = (ProgressBar) activity.findViewById(R.id.dayProgressBar);
     }
 
     /**
@@ -125,9 +123,9 @@ public class DayView {
      */
     private void initDayDots() {
         dayDots = new TextView[3];
-        dayDots[0] = (TextView)DisplayHistoryActivity.getActivity().findViewById(R.id.currentTemperature);
-        dayDots[1] = (TextView)DisplayHistoryActivity.getActivity().findViewById(R.id.currentHumidity);
-        dayDots[2] = (TextView)DisplayHistoryActivity.getActivity().findViewById(R.id.currentPM);
+        dayDots[0] = (TextView) activity.findViewById(R.id.currentTemperature);
+        dayDots[1] = (TextView) activity.findViewById(R.id.currentHumidity);
+        dayDots[2] = (TextView) activity.findViewById(R.id.currentPM);
         dayCurrentIndex = 0;
         dayDots[0].setTextColor(Color.RED);
     }
@@ -146,4 +144,7 @@ public class DayView {
         dayCurrentIndex = position;
     }
 
+    public void flushView(BeanLineView lineView, BeanTabMessage tab) {
+        RequestUtil.flushView(lineView, tab, "日 时:分");
+    }
 }

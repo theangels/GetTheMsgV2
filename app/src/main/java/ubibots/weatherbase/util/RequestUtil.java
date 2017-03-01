@@ -1,7 +1,6 @@
 package ubibots.weatherbase.util;
 
 import android.graphics.Color;
-import android.nfc.Tag;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -17,14 +16,13 @@ import ubibots.weatherbase.DisplayHistoryActivity;
 import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanLineView;
 import ubibots.weatherbase.model.BeanTabMessage;
-import ubibots.weatherbase.ui.DisplayView;
 import ubibots.weatherbase.ui.MonitorView;
 
 public class RequestUtil {
     public static void flushView(BeanLineView lineView, BeanTabMessage tab, String xName) {
         //停止监控
-        if (MonitorView.getVideoView() != null) {
-            MonitorView.getVideoView().pause();
+        if (MonitorView.thisClass != null) {
+            MonitorView.thisClass.getVideoView().pause();
         }
 
         //温度
@@ -387,30 +385,14 @@ public class RequestUtil {
         lineView.getAirView().setLineChartData(airData);
 
         //开启监控
-        if (MonitorView.getVideoView() != null) {
+        if (MonitorView.thisClass != null) {
             Log.i("TAG", "StartMonitor");
-            MonitorView.getVideoView().start();
+            MonitorView.thisClass.getVideoView().start();
         }
     }
 
-    public static void flushCurrentView(BeanTabMessage tab) {
-        String msg;
-        msg = tab.getTemperature().get(tab.getTemperature().size() - 1) + " ℃";
-        DisplayView.getCurrentView().getCurrentTemperature().setText(msg);
-        msg = tab.getHumidity().get(tab.getHumidity().size() - 1) + " %RH";
-        DisplayView.getCurrentView().getCurrentHumidity().setText(msg);
-        msg = tab.getAir().get(tab.getAir().size() - 1) + " μg/m3";
-        DisplayView.getCurrentView().getCurrentPM2_5().setText(msg);
-        msg = tab.getPressure().get(tab.getPressure().size() - 1) + " hPa";
-        DisplayView.getCurrentView().getCurrentAirPressure().setText(msg);
-        msg = tab.getWindSpeed().get(tab.getWindSpeed().size() - 1) + " mph";
-        DisplayView.getCurrentView().getCurrentWindSpeed().setText(msg);
-        msg = "" + tab.getWindDirection().get(tab.getWindDirection().size() - 1);
-        DisplayView.getCurrentView().getCurrentWindDirection().setText(msg);
-    }
-
     public static void connectFailed() {
-        Toast.makeText(DisplayHistoryActivity.getContext(), "获取数据失败，可能该时间段不存在数据或者网络连接中断!",
+        Toast.makeText(ContextUtil.getInstance(), "获取数据失败，可能该时间段不存在数据或者网络连接中断!",
                 Toast.LENGTH_SHORT).show();
     }
 }

@@ -1,4 +1,4 @@
-package ubibots.weatherbase.util;
+package ubibots.weatherbase.model;
 
 import android.content.Context;
 import android.util.AttributeSet;

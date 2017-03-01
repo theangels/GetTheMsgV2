@@ -5,50 +5,53 @@ import android.os.Handler;
 import android.os.Message;
 import android.widget.Toast;
 
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import ubibots.weatherbase.DisplayHistoryActivity;
 import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanTabMessage;
 import ubibots.weatherbase.ui.DayView;
-import ubibots.weatherbase.ui.HourView;
-import ubibots.weatherbase.util.RequestUtil;
+import ubibots.weatherbase.util.ContextUtil;
 import ubibots.weatherbase.util.URLUtil;
 
-public class RequestDay {
+class RequestDay {
+
+    private static DayView dayView;
+
     private static RequestDayHandler requestDayHandler;
 
-    public RequestDay() {
+    RequestDay(DayView dayView) {
+        RequestDay.dayView = dayView;
         requestDayHandler = new RequestDayHandler();
     }
 
-    public void executeRequest() {
-        DayView.setDay(new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>()));
+    void executeRequest() {
+        dayView.day = new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>());
         Calendar dayCalendar = Calendar.getInstance();
         dayCalendar.set(Calendar.SECOND, dayCalendar.get(Calendar.SECOND) - BeanConstant.delayDay / 1000 * (RequestDayHistory.MAX - 1));
         for (int i = 0; i < RequestDayHistory.MAX; i++) {
-            DayView.getDay().getTemperature().add(0.0);
-            DayView.getDay().getRainFall().add(0.0);
-            DayView.getDay().getHumidity().add(0.0);
-            DayView.getDay().getWindSpeed().add(0.0);
-            DayView.getDay().getAir().add(0.0);
-            DayView.getDay().getWindDirection().add(0.0);
-            DayView.getDay().getPressure().add(0.0);
-            DayView.getDay().getTimeStamp().add("");
-            dayHistory(DayView.getDay(), dayCalendar, i);
+            dayView.day.getTemperature().add(0.0);
+            dayView.day.getRainFall().add(0.0);
+            dayView.day.getHumidity().add(0.0);
+            dayView.day.getWindSpeed().add(0.0);
+            dayView.day.getAir().add(0.0);
+            dayView.day.getWindDirection().add(0.0);
+            dayView.day.getPressure().add(0.0);
+            dayView.day.getTimeStamp().add("");
+            dayHistory(dayView.day, dayCalendar, i);
             dayCalendar.set(Calendar.SECOND, dayCalendar.get(Calendar.SECOND) + BeanConstant.delayDay / 1000);
         }
 
-        Toast.makeText(DisplayHistoryActivity.getContext(), "正在获取数据中,请耐心等待...",
+        Toast.makeText(ContextUtil.getInstance(), "正在获取数据中,请耐心等待...",
                 Toast.LENGTH_LONG).show();
     }
 
-    public static void dayHistory(BeanTabMessage day, Calendar calendar, int id) {
+    private void dayHistory(BeanTabMessage day, Calendar calendar, int id) {
         String strUrl = URLUtil.combineUrl((Calendar) calendar.clone());
-        RequestDayHistory request = new RequestDayHistory(day, id, 0);
+        RequestDayHistory request = new RequestDayHistory(dayView, day, id, 0);
         request.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, strUrl);
     }
 
@@ -64,27 +67,28 @@ public class RequestDay {
         }
     };
 
-    public static Timer getRequestDayTimer() {
+    static Timer getRequestDayTimer() {
         return requestDayTimer;
     }
 
-    public static TimerTask getRequestDayTask() {
+    static TimerTask getRequestDayTask() {
         return requestDayTask;
     }
 
-    static class RequestDayHandler extends Handler {
+    private static class RequestDayHandler extends Handler {
+
         public void handleMessage(Message msg) {
             if (msg.what == 1) {
                 Calendar calendar = Calendar.getInstance();
-                dayStep(DayView.getDay(), calendar);
+                dayStep(dayView.day, calendar);
             }
             super.handleMessage(msg);
         }
     }
 
-    public static void dayStep(BeanTabMessage day, Calendar calendar) {
+    private static void dayStep(BeanTabMessage day, Calendar calendar) {
         String strUrl = URLUtil.combineUrl((Calendar) calendar.clone());
-        RequestDayStep request = new RequestDayStep(day, 0);
+        RequestDayStep request = new RequestDayStep(dayView, day, 0);
         request.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, strUrl);
     }
 }

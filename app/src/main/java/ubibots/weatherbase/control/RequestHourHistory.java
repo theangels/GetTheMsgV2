@@ -1,7 +1,6 @@
 package ubibots.weatherbase.control;
 
 import android.os.AsyncTask;
-import android.text.LoginFilter;
 import android.util.Log;
 import android.view.View;
 
@@ -19,18 +18,26 @@ import java.util.regex.Pattern;
 import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanFlag;
 import ubibots.weatherbase.model.BeanTabMessage;
+import ubibots.weatherbase.ui.DayView;
 import ubibots.weatherbase.ui.HourView;
+import ubibots.weatherbase.ui.ListTab;
 import ubibots.weatherbase.util.DateUtil;
 import ubibots.weatherbase.util.RequestUtil;
 
-public class RequestHourHistory extends AsyncTask<String, Integer, String> {
-    public final static int MAX = 120;
+class RequestHourHistory extends AsyncTask<String, Integer, String> {
+
+    final static int MAX = 120;
+
     private BeanTabMessage hour;
     private int id;
     private String strURL;
     private int time;
+    private HourView hourView;
+    private DayView dayView;
 
-    public RequestHourHistory(BeanTabMessage hour, int id, int time) {
+    RequestHourHistory(HourView hourView, DayView dayView, BeanTabMessage hour, int id, int time) {
+        this.hourView = hourView;
+        this.dayView = dayView;
         this.hour = hour;
         this.id = id;
         this.time = time;
@@ -88,37 +95,37 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
                 }
                 String rainFallString = tmp.get(1);
                 double r = 0;
-                if(!rainFallString.equals("---")){
+                if (!rainFallString.equals("---")) {
                     r = Double.valueOf(rainFallString);
                 }
                 String humidityString = tmp.get(2);
                 double h = 0;
-                if(!humidityString.equals("---")){
+                if (!humidityString.equals("---")) {
                     h = Double.valueOf(humidityString);
                 }
                 String windSpeedString = tmp.get(3);
                 double s = 0;
-                if(!windSpeedString.equals("---")){
+                if (!windSpeedString.equals("---")) {
                     s = Double.valueOf(windSpeedString);
                 }
                 String airString = tmp.get(4);
                 double a = 0;
-                if(!airString.equals("---")){
+                if (!airString.equals("---")) {
                     a = Double.valueOf(airString);
                 }
                 String windDirectionString = tmp.get(5);
                 double d = 0;
-                if(!windDirectionString.equals("---")){
+                if (!windDirectionString.equals("---")) {
                     d = Double.valueOf(windDirectionString);
                 }
                 String pressureString = tmp.get(6);
                 double p = 0;
-                if(!pressureString.equals("---")){
+                if (!pressureString.equals("---")) {
                     p = Double.valueOf(pressureString);
                 }
                 String timeStampString = tmp.get(7);
-                timeStampString = timeStampString.replace("&#x3a;",":");
-                timeStampString = timeStampString.replace("&#x2b;","+");
+                timeStampString = timeStampString.replace("&#x3a;", ":");
+                timeStampString = timeStampString.replace("&#x2b;", "+");
 
                 //丢包重发
                 if (t < 0 || r < 0 || h < 0 || s < 0 || a < 0 || d < 0 || p < 0 || timeStampString.length() != 29) {
@@ -138,23 +145,23 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
                 hour.getWindSpeed().set(id, s);
                 hour.getAir().set(id, a);
                 hour.getWindDirection().set(id, d);
-                hour.getPressure().set(id,p);
+                hour.getPressure().set(id, p);
                 hour.getTimeStamp().set(id, timeStampString);
                 hour.count++;
 
                 //历史数据收集完毕
                 if (hour.count == MAX) {
-                    //刷新界面
                     BeanFlag.isFinishRoadHour = true;
 
-                    RequestUtil.flushView(HourView.getHourBeanLineView(), hour, "时:分:秒");
-                    RequestUtil.flushCurrentView(hour);
+                    //刷新界面
+                    hourView.flushView(hourView.getHourBeanLineView(), hour);
+                    hourView.flushCurrentView(hour);
 
                     RequestHour.getRequestHourTimer().schedule(RequestHour.getRequestHourTask(), BeanConstant.delayHour, BeanConstant.delayHour);
-                    HourView.getHourProgressBar().setVisibility(View.GONE);
-                    HourView.getHourViewPager().setVisibility(View.VISIBLE);
+                    hourView.getHourProgressBar().setVisibility(View.GONE);
+                    ListTab.thisClass.hourVisible();
 
-                    new RequestDay().executeRequest();
+                    new RequestDay(dayView).executeRequest();
                 }
                 System.out.println("Time: " + hour.getTimeStamp().get(id) + " " + "Temperature: " + hour.getTemperature().get(id) + " " + "Humidity: " + hour.getHumidity().get(id) + " " + "Num: " + id + " " + "Count: " + hour.count + " " + "Time: " + time);
             } else {//丢包重发
@@ -172,27 +179,27 @@ public class RequestHourHistory extends AsyncTask<String, Integer, String> {
     protected void onPreExecute() {
     }
 
-    public void reconnect(String strURL, BeanTabMessage hour, int id) {
+    private void reconnect(String strURL, BeanTabMessage hour, int id) {
         int time = this.time + 1;
         if (time <= BeanConstant.MAXTIME) {
-            RequestHourHistory another = new RequestHourHistory(hour, id, time);
+            RequestHourHistory another = new RequestHourHistory(hourView, dayView, hour, id, time);
             System.out.println("time: " + time);
             System.out.println(strURL);
             another.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, strURL);
-        }else {
+        } else {
             hour.count++;
             if (hour.count == MAX) {
                 //刷新界面
                 BeanFlag.isFinishRoadHour = true;
 
-                RequestUtil.flushView(HourView.getHourBeanLineView(), hour, "时:分:秒");
-                RequestUtil.flushCurrentView(hour);
+                hourView.flushView(hourView.getHourBeanLineView(), hour);
+                hourView.flushCurrentView(hour);
 
                 RequestHour.getRequestHourTimer().schedule(RequestHour.getRequestHourTask(), BeanConstant.delayHour, BeanConstant.delayHour);
-                HourView.getHourProgressBar().setVisibility(View.GONE);
-                HourView.getHourViewPager().setVisibility(View.VISIBLE);
+                hourView.getHourProgressBar().setVisibility(View.GONE);
+                ListTab.thisClass.hourVisible();
 
-                new RequestDay().executeRequest();
+                new RequestDay(dayView).executeRequest();
             }
             RequestUtil.connectFailed();
         }

@@ -10,7 +10,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.NoActionBar" >
+        android:theme="@style/Theme.AppCompat.NoActionBar"
+        android:name=".util.ContextUtil">
         <activity
             android:name=".DisplayHistoryActivity"
             android:screenOrientation="landscape">

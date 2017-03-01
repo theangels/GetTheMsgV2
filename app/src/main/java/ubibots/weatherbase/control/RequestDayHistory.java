@@ -19,18 +19,20 @@ import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanFlag;
 import ubibots.weatherbase.model.BeanTabMessage;
 import ubibots.weatherbase.ui.DayView;
-import ubibots.weatherbase.ui.MonitorView;
 import ubibots.weatherbase.util.DateUtil;
 import ubibots.weatherbase.util.RequestUtil;
 
-public class RequestDayHistory extends AsyncTask<String, Integer, String> {
-    public final static int MAX = 48;
+class RequestDayHistory extends AsyncTask<String, Integer, String> {
+
+    final static int MAX = 48;
     private BeanTabMessage day;
     private int id;
     private String strURL;
     private int time;
+    private DayView dayView;
 
-    public RequestDayHistory(BeanTabMessage day, int id, int time) {
+    RequestDayHistory(DayView dayView, BeanTabMessage day, int id, int time) {
+        this.dayView = dayView;
         this.day = day;
         this.id = id;
         this.time = time;
@@ -145,14 +147,10 @@ public class RequestDayHistory extends AsyncTask<String, Integer, String> {
                     //刷新界面
                     BeanFlag.isFinishRoadDay = true;
 
-                    RequestUtil.flushView(DayView.getDayBeanLineView(), day, "日 时:分");
+                    dayView.flushView(dayView.getDayBeanLineView(), day);
 
                     RequestDay.getRequestDayTimer().schedule(RequestDay.getRequestDayTask(), BeanConstant.delayDay, BeanConstant.delayDay);
-                    DayView.getDayProgressBar().setVisibility(View.GONE);
-                    DayView.getDayViewPager().setVisibility(View.VISIBLE);
-
-                    //开启监控
-                    new MonitorView();
+                    dayView.getDayProgressBar().setVisibility(View.GONE);
                 }
                 System.out.println("Time: " + day.getTimeStamp().get(id) + " " + "Temperature: " + day.getTemperature().get(id) + " " + "Humidity: " + day.getHumidity().get(id) + " " + "Num: " + id + " " + "Count: " + day.count + " " + "Time: " + time);
             } else {//丢包重发
@@ -170,27 +168,23 @@ public class RequestDayHistory extends AsyncTask<String, Integer, String> {
     protected void onPreExecute() {
     }
 
-    public void reconnect(String strURL, BeanTabMessage day, int id) {
+    private void reconnect(String strURL, BeanTabMessage day, int id) {
         int time = this.time + 1;
         if (time <= BeanConstant.MAXTIME) {
-            RequestDayHistory another = new RequestDayHistory(day, id, time);
+            RequestDayHistory another = new RequestDayHistory(dayView, day, id, time);
             System.out.println("time: " + time);
             System.out.println(strURL);
             another.execute(strURL);
-        }else {
+        } else {
             day.count++;
             if (day.count == MAX) {
                 //刷新界面
                 BeanFlag.isFinishRoadDay = true;
 
-                RequestUtil.flushView(DayView.getDayBeanLineView(), day, "日 时:分");
+                dayView.flushView(dayView.getDayBeanLineView(), day);
 
                 RequestDay.getRequestDayTimer().schedule(RequestDay.getRequestDayTask(), BeanConstant.delayDay, BeanConstant.delayDay);
-                DayView.getDayProgressBar().setVisibility(View.GONE);
-                DayView.getDayViewPager().setVisibility(View.VISIBLE);
-
-                //开启监控
-                new MonitorView();
+                dayView.getDayProgressBar().setVisibility(View.GONE);
             }
             RequestUtil.connectFailed();
         }
