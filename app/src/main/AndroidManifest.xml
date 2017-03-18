@@ -13,7 +13,7 @@
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:name=".util.ContextUtil">
         <activity
-            android:name=".DisplayHistoryActivity"
+            android:name=".activity.DisplayHistoryActivity"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

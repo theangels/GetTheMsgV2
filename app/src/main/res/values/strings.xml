@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">UbiBotsWeatherBase</string>
-    <string name="url_monitor">rtsp://admin:ZUCCli511@10.66.15.152:554/h264/ch1/sub</string>
+    <string name="url_monitor">rtsp://admin:ZUCCli511@192.168.10.64:554/h264/ch1/main</string>
 </resources>

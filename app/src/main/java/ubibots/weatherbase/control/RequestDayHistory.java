@@ -19,6 +19,8 @@ import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanFlag;
 import ubibots.weatherbase.model.BeanTabMessage;
 import ubibots.weatherbase.ui.DayView;
+import ubibots.weatherbase.ui.DisplayView;
+import ubibots.weatherbase.ui.MonitorView;
 import ubibots.weatherbase.util.DateUtil;
 import ubibots.weatherbase.util.RequestUtil;
 
@@ -151,6 +153,9 @@ class RequestDayHistory extends AsyncTask<String, Integer, String> {
 
                     RequestDay.getRequestDayTimer().schedule(RequestDay.getRequestDayTask(), BeanConstant.delayDay, BeanConstant.delayDay);
                     dayView.getDayProgressBar().setVisibility(View.GONE);
+
+                    MonitorView.thisClass.getVideoView().start();
+                    MonitorView.thisClass.getVideoView().requestFocus();
                 }
                 System.out.println("Time: " + day.getTimeStamp().get(id) + " " + "Temperature: " + day.getTemperature().get(id) + " " + "Humidity: " + day.getHumidity().get(id) + " " + "Num: " + id + " " + "Count: " + day.count + " " + "Time: " + time);
             } else {//丢包重发

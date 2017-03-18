@@ -12,7 +12,6 @@ import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Line;
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.PointValue;
-import ubibots.weatherbase.DisplayHistoryActivity;
 import ubibots.weatherbase.model.BeanConstant;
 import ubibots.weatherbase.model.BeanLineView;
 import ubibots.weatherbase.model.BeanTabMessage;
@@ -20,11 +19,6 @@ import ubibots.weatherbase.ui.MonitorView;
 
 public class RequestUtil {
     public static void flushView(BeanLineView lineView, BeanTabMessage tab, String xName) {
-        //停止监控
-        if (MonitorView.thisClass != null) {
-            MonitorView.thisClass.getVideoView().pause();
-        }
-
         //温度
         List<Line> temperatureLineList = new ArrayList<>();
         List<PointValue> temperatureValuesList;
@@ -383,12 +377,6 @@ public class RequestUtil {
         axisY2.setMaxLabelChars(4);
         airData.setAxisYRight(axisY2);
         lineView.getAirView().setLineChartData(airData);
-
-        //开启监控
-        if (MonitorView.thisClass != null) {
-            Log.i("TAG", "StartMonitor");
-            MonitorView.thisClass.getVideoView().start();
-        }
     }
 
     public static void connectFailed() {
