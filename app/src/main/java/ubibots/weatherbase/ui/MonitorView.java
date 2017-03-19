@@ -28,6 +28,7 @@ public class MonitorView {
         videoView = (MyVideoView) activity.findViewById(R.id.video);
         final String url = ContextUtil.getInstance().getString(R.string.url_monitor);
         videoView.setVideoURI(Uri.parse(url));
+        videoView.setDrawingCacheEnabled(false);
         Log.i("Tag", "Start!");
 
         videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
@@ -107,7 +108,7 @@ public class MonitorView {
                             "正在缓冲",
                             Toast.LENGTH_LONG).show();
                 } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
-                    videoView.destroyDrawingCache();
+
                 }
                 return false;
             }
