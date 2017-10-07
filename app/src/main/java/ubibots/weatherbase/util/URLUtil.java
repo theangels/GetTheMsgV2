@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class URLUtil {
     public static String combineUrl(Calendar calendar) {
-        String ipAddress = "10.66.15.150";
+        String ipAddress = "10.66.15.225";
         String appKey = "1ad15213-cdc2-4da6-9816-01b2aeb36475";
         String things = "WeatherBase";
         String service;
