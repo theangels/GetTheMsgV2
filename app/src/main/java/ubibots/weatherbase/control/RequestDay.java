@@ -29,7 +29,7 @@ class RequestDay {
     }
 
     void executeRequest() {
-        dayView.day = new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>());
+        dayView.day = new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>(), new ArrayList<Double>(), new ArrayList<String>());
         Calendar dayCalendar = Calendar.getInstance();
         dayCalendar.set(Calendar.SECOND, dayCalendar.get(Calendar.SECOND) - BeanConstant.delayDay / 1000 * (RequestDayHistory.MAX - 1));
         for (int i = 0; i < RequestDayHistory.MAX; i++) {
@@ -38,7 +38,7 @@ class RequestDay {
             dayView.day.getHumidity().add(0.0);
             dayView.day.getWindSpeed().add(0.0);
             dayView.day.getAir().add(0.0);
-            dayView.day.getWindDirection().add(0.0);
+            dayView.day.getWindDirection().add("");
             dayView.day.getPressure().add(0.0);
             dayView.day.getTimeStamp().add("");
             dayHistory(dayView.day, dayCalendar, i);

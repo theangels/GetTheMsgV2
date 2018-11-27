@@ -30,7 +30,7 @@ public class RequestHour {
     }
 
     public void executeRequest() {
-        hourView.hour = new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>());
+        hourView.hour = new BeanTabMessage(new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<Double>(), new ArrayList<String>(), new ArrayList<Double>(), new ArrayList<String>());
         Calendar hourCalendar = Calendar.getInstance();
         hourCalendar.set(Calendar.SECOND, hourCalendar.get(Calendar.SECOND) - BeanConstant.delayHour / 1000 * (RequestHourHistory.MAX - 1));
         for (int i = 0; i < RequestHourHistory.MAX; i++) {
@@ -39,7 +39,7 @@ public class RequestHour {
             hourView.hour.getHumidity().add(0.0);
             hourView.hour.getWindSpeed().add(0.0);
             hourView.hour.getAir().add(0.0);
-            hourView.hour.getWindDirection().add(0.0);
+            hourView.hour.getWindDirection().add("");
             hourView.hour.getPressure().add(0.0);
             hourView.hour.getTimeStamp().add("");
             hourHistory(hourView.hour, hourCalendar, i);

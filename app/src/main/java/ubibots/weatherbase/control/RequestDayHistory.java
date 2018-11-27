@@ -109,9 +109,9 @@ class RequestDayHistory extends AsyncTask<String, Integer, String> {
                     a = Double.valueOf(airString);
                 }
                 String windDirectionString = tmp.get(5);
-                double d = 0;
+                String d = "";
                 if (!windDirectionString.equals("---")) {
-                    d = Double.valueOf(windDirectionString);
+                    d = windDirectionString;
                 }
                 String pressureString = tmp.get(6);
                 double p = 0;
@@ -123,7 +123,7 @@ class RequestDayHistory extends AsyncTask<String, Integer, String> {
                 timeStampString = timeStampString.replace("&#x2b;", "+");
 
                 //丢包重发
-                if (t < 0 || r < 0 || h < 0 || s < 0 || a < 0 || d < 0 || p < 0 || timeStampString.length() != 29) {
+                if (t < 0 || r < 0 || h < 0 || s < 0 || a < 0 || p < 0 || timeStampString.length() != 29) {
                     reconnect(strURL, day, id);
                     return;
                 }

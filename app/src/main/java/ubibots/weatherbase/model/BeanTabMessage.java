@@ -9,11 +9,11 @@ public class BeanTabMessage {
     private ArrayList<Double> humidity;
     private ArrayList<Double> windSpeed;
     private ArrayList<Double> air;
-    private ArrayList<Double> windDirection;
+    private ArrayList<String> windDirection;
     private ArrayList<Double> pressure;
     private ArrayList<String> timeStamp;
 
-    public BeanTabMessage(ArrayList<Double> temperature, ArrayList<Double> rainFall, ArrayList<Double> humidity, ArrayList<Double> windSpeed, ArrayList<Double> air, ArrayList<Double> windDirection, ArrayList<Double> pressure, ArrayList<String> timeStamp) {
+    public BeanTabMessage(ArrayList<Double> temperature, ArrayList<Double> rainFall, ArrayList<Double> humidity, ArrayList<Double> windSpeed, ArrayList<Double> air, ArrayList<String> windDirection, ArrayList<Double> pressure, ArrayList<String> timeStamp) {
         this.temperature = temperature;
         this.rainFall = rainFall;
         this.humidity = humidity;
@@ -44,7 +44,7 @@ public class BeanTabMessage {
         return air;
     }
 
-    public ArrayList<Double> getWindDirection() {
+    public ArrayList<String> getWindDirection() {
         return windDirection;
     }
 
